@@ -15,9 +15,10 @@ type Props = {
   variant?: 'primary' | 'outline' | 'danger' | 'ghost';
   compact?: boolean;
   icon?: IconName;
+  accessibilityHint?: string; // o que acontece ao tocar, quando não é óbvio (ex.: abre outro app)
 };
 
-export function Button({ title, onPress, loading, disabled, variant = 'primary', compact, icon }: Props) {
+export function Button({ title, onPress, loading, disabled, variant = 'primary', compact, icon, accessibilityHint }: Props) {
   const c = useColors();
   const primary = variant === 'primary';
   const outline = variant === 'outline';
@@ -26,6 +27,7 @@ export function Button({ title, onPress, loading, disabled, variant = 'primary',
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled: disabled || loading }}
       disabled={disabled || loading}
       onPress={onPress}

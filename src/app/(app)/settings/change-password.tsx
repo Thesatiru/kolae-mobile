@@ -7,14 +7,13 @@ import { useTranslation } from 'react-i18next';
 import { changePassword, forgotPassword } from '@/api/auth';
 import { toApiError } from '@/api/errors';
 import { useAuth } from '@/auth/AuthProvider';
+import { PASSWORD_MIN_LENGTH } from '@/auth/rules';
 import { Button } from '@/components/Button';
 import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { TextField } from '@/components/TextField';
 import { useColors } from '@/theme/useColors';
-
-const MIN_LENGTH = 6;
 
 function Rule({ ok, label }: { ok: boolean; label: string }) {
   const c = useColors();
@@ -42,7 +41,7 @@ export default function ChangePasswordScreen() {
   const [loading, setLoading] = useState(false);
 
   const rules = {
-    length: password.length >= MIN_LENGTH,
+    length: password.length >= PASSWORD_MIN_LENGTH,
     different: password.length > 0 && password !== current,
     match: password.length > 0 && password === confirmation,
   };
@@ -118,7 +117,7 @@ export default function ChangePasswordScreen() {
       />
 
       <View style={styles.rules}>
-        <Rule ok={rules.length} label={t('app_rule_min', { count: MIN_LENGTH })} />
+        <Rule ok={rules.length} label={t('app_rule_min', { count: PASSWORD_MIN_LENGTH })} />
         <Rule ok={rules.different} label={t('app_rule_different')} />
         <Rule ok={rules.match} label={t('app_rule_match')} />
       </View>

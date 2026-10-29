@@ -9,7 +9,7 @@ import { Text } from '@/components/Text';
 import { useFavorites } from '@/favorites/FavoritesProvider';
 import { usePreferences } from '@/preferences/PreferencesProvider';
 import { useColors } from '@/theme/useColors';
-import { formatPrice, formatPricePerHour, formatRating } from '@/utils/format';
+import { formatPrice, formatPricePerHour, noPriceLabel } from '@/utils/format';
 
 export function VenueCard({ venue, width = 164 }: { venue: VenueSummary; width?: number }) {
   const c = useColors();
@@ -18,13 +18,12 @@ export function VenueCard({ venue, width = 164 }: { venue: VenueSummary; width?:
   const { motionReduced } = usePreferences();
   const favorite = isFavorite(venue.id);
 
-  // Leitor de tela: o card é lido como uma frase só ("Sesc, gratuito, nota 5 de 5") e
-  // favoritar vira uma ação do card (o coração dentro dele não recebe foco separado).
+  // Leitor de tela: o card é lido como uma frase só ("Sesc, grátis") e favoritar vira
+  // uma ação do card (o coração dentro dele não recebe foco separado).
   const price = formatPrice(venue.price_per_hour_cents);
   const a11yLabel = [
     venue.name,
-    price ? t('app_a11y_price_per_hour', { price }) : t('app_free'),
-    venue.rating !== null ? t('app_a11y_rating', { rating: formatRating(venue.rating) }) : null,
+    price ? t('app_a11y_price_per_hour', { price }) : noPriceLabel(venue.price_per_hour_cents),
     favorite ? t('app_a11y_in_favorites') : null,
   ]
     .filter(Boolean)
@@ -39,7 +38,7 @@ export function VenueCard({ venue, width = 164 }: { venue: VenueSummary; width?:
       style={({ pressed }) => [{ width, opacity: pressed ? 0.85 : 1 }]}
       onPress={() => router.push({ pathname: '/venue/[id]', params: { id: String(venue.id) } })}>
       <View style={[styles.imageBox, { width, height: width, backgroundColor: c.surface }]}>
-        <Image source={venue.cover_url} style={StyleSheet.absoluteFill} contentFit="cover" transition={motionReduced ? 0 : 150} />
+        <Image source={venue.cover_image_url} style={StyleSheet.absoluteFill} contentFit="cover" transition={motionReduced ? 0 : 150} />
         <Pressable
           accessible={false}
           importantForAccessibility="no-hide-descendants"
@@ -53,17 +52,7 @@ export function VenueCard({ venue, width = 164 }: { venue: VenueSummary; width?:
       <Text style={[styles.name, { color: c.text }]} numberOfLines={2}>
         {venue.name}
       </Text>
-      <View style={styles.row}>
-        <Text style={[styles.small, { color: c.textMuted }]}>
-          {formatPricePerHour(venue.price_per_hour_cents, t('app_free'))}
-        </Text>
-        {venue.rating !== null ? (
-          <View style={styles.rating}>
-            <MaterialCommunityIcons name="star" size={14} color={c.textMuted} />
-            <Text style={[styles.small, { color: c.textMuted }]}>{formatRating(venue.rating)}</Text>
-          </View>
-        ) : null}
-      </View>
+      <Text style={[styles.small, { color: c.textMuted }]}>{formatPricePerHour(venue.price_per_hour_cents)}</Text>
     </Pressable>
   );
 }
@@ -74,7 +63,5 @@ const styles = StyleSheet.create({
   // sombra leve para o coração branco aparecer em fotos claras
   heartIcon: { textShadowColor: 'rgba(0,0,0,0.45)', textShadowRadius: 4 },
   name: { fontSize: 16, marginBottom: 2 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  rating: { flexDirection: 'row', alignItems: 'center', gap: 2 },
   small: { fontSize: 12 },
 });

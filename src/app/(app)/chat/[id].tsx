@@ -33,7 +33,7 @@ function VenueAvatar({ venue, size }: { venue: VenueDetail | undefined; size: nu
   const c = useColors();
   return (
     <Image
-      source={venue?.cover_url}
+      source={venue?.cover_image_url}
       accessible={false}
       style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: c.surface }}
       contentFit="cover"

@@ -5,7 +5,11 @@ import i18n from '@/i18n';
 import { toApiError } from './errors';
 
 export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
-export const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK === 'true';
+// Mock por área: dá para usar o login real com as quadras ainda falsas (ou o contrário).
+export const MOCK_AUTH = process.env.EXPO_PUBLIC_MOCK_AUTH === 'true';
+export const MOCK_VENUES = process.env.EXPO_PUBLIC_MOCK_VENUES === 'true';
+/** Alguma área usa dados falsos: mostra o aviso de modo de teste. */
+export const ANY_MOCK = MOCK_AUTH || MOCK_VENUES;
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -13,7 +17,16 @@ export const api = axios.create({
   headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
 });
 
-// O AuthProvider registra aqui o que fazer quando o token expira (401).
+// Erros de token (D10): só neles a sessão acabou. INVALID_CREDENTIALS é só senha errada no login.
+export const SESSION_ERROR_CODES = new Set([
+  'AUTH_MISSING_TOKEN',
+  'AUTH_INVALID_FORMAT',
+  'AUTH_TOKEN_EXPIRED',
+  'AUTH_INVALID_TOKEN',
+  'AUTH_INVALID_USER',
+]);
+
+// O AuthProvider registra aqui o que fazer quando o token não vale mais.
 let onUnauthorized: (() => void) | null = null;
 export function setOnUnauthorized(fn: (() => void) | null) {
   onUnauthorized = fn;
@@ -31,9 +44,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const apiError = toApiError(error);
-    // 401 em rota autenticada = sessão expirada. No login, é só senha errada.
-    const isLogin = error?.config?.url?.includes('/auth/login');
-    if (apiError.status === 401 && !isLogin) onUnauthorized?.();
+    if (SESSION_ERROR_CODES.has(apiError.code)) onUnauthorized?.();
     return Promise.reject(apiError);
   },
 );

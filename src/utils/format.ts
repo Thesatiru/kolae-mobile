@@ -4,13 +4,18 @@ import i18n from '@/i18n';
 // en-us: "R$120", "4.8", "9:00 PM"). O preço é sempre em reais: as quadras são no Brasil.
 const locale = () => i18n.language;
 
-/** 12000 -> "R$ 120/h"; null -> texto de gratuito (vem do i18n). */
-export function formatPricePerHour(cents: number | null, freeLabel: string): string {
+/** 12000 -> "R$ 120/h"; 0 -> "Grátis"; null -> "Preço não informado" (D31). */
+export function formatPricePerHour(cents: number | null): string {
   const price = formatPrice(cents);
-  return price ? `${price}${i18n.t('app_per_hour_short')}` : freeLabel;
+  return price ? `${price}${i18n.t('app_per_hour_short')}` : noPriceLabel(cents);
 }
 
-/** 12000 -> "R$ 120"; null -> null (gratuito). Para quando o "/hora" tem estilo próprio. */
+/** Texto no lugar do preço: 0 = grátis; null = o dono não informou. */
+export function noPriceLabel(cents: number | null): string {
+  return i18n.t(cents === 0 ? 'app_free' : 'app_price_unknown');
+}
+
+/** 12000 -> "R$ 120"; 0 ou null -> null (use noPriceLabel). Para quando o "/hora" tem estilo próprio. */
 export function formatPrice(cents: number | null): string | null {
   if (cents === null || cents === 0) return null;
   const reais = cents / 100;
@@ -31,6 +36,18 @@ export function formatPrice(cents: number | null): string | null {
 /** "2026-10-28T21:00:00Z" -> "21:00" no fuso do aparelho. */
 export function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
+}
+
+/** "08:00" (horário de funcionamento) -> "08:00" (pt-br) / "8:00 AM" (en-us) */
+export function formatClock(hhmm: string): string {
+  const [h, m] = hhmm.split(':').map(Number);
+  return new Date(2000, 0, 1, h, m).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
+}
+
+/** 0 -> "domingo" ... 6 -> "sábado", no idioma do app. */
+export function formatWeekday(weekday: number): string {
+  // 07/01/2024 foi um domingo.
+  return new Date(2024, 0, 7 + weekday).toLocaleDateString(locale(), { weekday: 'long' });
 }
 
 /** "2026-10-28T..." -> "28 de out. de 2026" (pt-br) / "Oct 28, 2026" (en-us) */

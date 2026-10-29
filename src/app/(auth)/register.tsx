@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { toApiError } from '@/api/errors';
 import { useAuth } from '@/auth/AuthProvider';
+import { isOldEnough, MIN_AGE, PASSWORD_MIN_LENGTH } from '@/auth/rules';
 import { Button } from '@/components/Button';
 import { LogoMark } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
@@ -46,8 +47,10 @@ export default function RegisterScreen() {
     const e: Errors = {};
     if (!form.name.trim()) e.name = t('app_required');
     if (!EMAIL.test(form.email.trim())) e.email = t('app_invalid_email');
-    if (!brDateToIso(form.birthdate)) e.birthdate = t('app_invalid_date');
-    if (form.password.length < 6) e.password = t('app_password_min');
+    const birthdate = brDateToIso(form.birthdate);
+    if (!birthdate) e.birthdate = t('app_invalid_date');
+    else if (!isOldEnough(birthdate)) e.birthdate = t('app_min_age', { count: MIN_AGE });
+    if (form.password.length < PASSWORD_MIN_LENGTH) e.password = t('app_password_min', { count: PASSWORD_MIN_LENGTH });
     if (form.password !== form.password_confirmation) e.password_confirmation = t('app_password_mismatch');
     return e;
   }

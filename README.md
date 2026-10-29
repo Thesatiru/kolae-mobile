@@ -15,8 +15,12 @@ Abra no celular com o Expo Go (mesma rede Wi-Fi do computador).
 
 O arquivo `.env` controla de onde vêm os dados:
 
-- `EXPO_PUBLIC_USE_MOCK=true`: dados falsos no formato do contrato. Login de teste: `teste@kolae.com` / `123456`.
-- `EXPO_PUBLIC_USE_MOCK=false`: usa `EXPO_PUBLIC_API_URL`. Em dev, use o IP da máquina que roda o PHP (não `localhost`, que no celular é o próprio celular).
+- `EXPO_PUBLIC_MOCK_AUTH`: login, cadastro, esqueci a senha, perfil e senha.
+- `EXPO_PUBLIC_MOCK_VENUES`: esportes e quadras.
+
+Em cada área, `true` usa dados falsos no formato do contrato (login de teste: `teste@kolae.com` /
+`12345678`) e `false` usa `EXPO_PUBLIC_API_URL`. Em dev, use o IP da máquina que roda o PHP
+(não `localhost`, que no celular é o próprio celular).
 
 Depois de mudar o `.env`, reinicie com `npx expo start -c`.
 

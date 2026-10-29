@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { StarPicker, Stars } from '@/components/Stars';
 import { Text, useInputFont } from '@/components/Text';
-import { reviewStore, type Review } from '@/showcase/reviews';
+import { reviewStore, summarizeReviews, type Review } from '@/showcase/reviews';
 import { contrastOutline } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
@@ -48,8 +48,8 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
-// Vitrine: avaliações. Nota e total do topo vêm da API (quadra); lista, barras e o
-// "Avaliar quadra" são de exemplo e ficam só no celular.
+// Vitrine: avaliações. Nota, total, lista, barras e o "Avaliar quadra" são de exemplo e
+// ficam só no celular.
 export default function ReviewsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const venueId = Number(id);
@@ -65,8 +65,7 @@ export default function ReviewsScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const starColor = c.scheme === 'dark' || c.highContrast ? c.text : STAR_GOLD;
-  const mine = reviews.filter((r) => r.mine).length;
-  const total = (venue?.ratings_count ?? 0) + mine;
+  const { rating: average, count: total } = summarizeReviews(reviews);
   const counts = [5, 4, 3, 2, 1].map((stars) => reviews.filter((r) => r.rating === stars).length);
 
   function publish() {
@@ -97,10 +96,10 @@ export default function ReviewsScreen() {
         <View style={[styles.summary, { backgroundColor: c.surface }, contrastOutline(c)]}>
           <View
             accessible
-            accessibilityLabel={`${venue.rating !== null ? t('app_a11y_rating', { rating: formatRating(venue.rating) }) : ''}, ${t('app_reviews_count', { count: total })}`}
+            accessibilityLabel={`${average !== null ? t('app_a11y_rating', { rating: formatRating(average) }) : ''}, ${t('app_reviews_count', { count: total })}`}
             style={styles.average}>
-            <Text style={[styles.averageValue, { color: c.text }]}>{formatRating(venue.rating)}</Text>
-            {venue.rating !== null ? <Stars rating={venue.rating} color={starColor} size={18} /> : null}
+            <Text style={[styles.averageValue, { color: c.text }]}>{formatRating(average)}</Text>
+            {average !== null ? <Stars rating={average} color={starColor} size={18} /> : null}
             <Text style={[styles.date, { color: c.textMuted }]}>{t('app_reviews_count', { count: total })}</Text>
           </View>
           {/* Barras por estrela: só visuais, a média já foi lida acima. */}

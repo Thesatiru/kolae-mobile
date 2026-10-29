@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import * as authApi from '@/api/auth';
-import { setOnUnauthorized } from '@/api/client';
+import { SESSION_ERROR_CODES, setOnUnauthorized } from '@/api/client';
+import { toApiError } from '@/api/errors';
 import type { LoginInput, RegisterInput, User } from '@/api/types';
 import { clearToken, getToken, saveToken } from './token';
 
@@ -30,8 +31,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         if (await getToken()) setUser(await authApi.me());
-      } catch {
-        await clearToken();
+      } catch (err) {
+        // Só apaga o token se ele não vale mais (D10); sem internet, tenta de novo na próxima abertura.
+        if (SESSION_ERROR_CODES.has(toApiError(err).code)) await clearToken();
       } finally {
         setLoading(false);
       }

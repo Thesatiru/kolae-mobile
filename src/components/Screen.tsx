@@ -10,7 +10,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets, type Edge } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import { USE_MOCK } from '@/api/client';
+import { ANY_MOCK } from '@/api/client';
 import { Text } from '@/components/Text';
 import { useColors } from '@/theme/useColors';
 
@@ -34,7 +34,7 @@ export function Screen({ children, edges = ['top'], backgroundColor, contentStyl
   const bottomInset = edges.includes('bottom') ? 0 : insets.bottom;
   const flat = StyleSheet.flatten(contentStyle) ?? {};
   const basePadding = Number(flat.paddingBottom ?? flat.paddingVertical ?? flat.padding ?? DEFAULT_PADDING);
-  const paddingBottom = basePadding + bottomInset + (USE_MOCK ? BANNER_SPACE : 0);
+  const paddingBottom = basePadding + bottomInset + (ANY_MOCK ? BANNER_SPACE : 0);
   return (
     <SafeAreaView edges={edges} style={[styles.flex, { backgroundColor: backgroundColor ?? c.background }]}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -45,7 +45,7 @@ export function Screen({ children, edges = ['top'], backgroundColor, contentStyl
           {children}
         </ScrollView>
       </KeyboardAvoidingView>
-      {USE_MOCK ? (
+      {ANY_MOCK ? (
         <View pointerEvents="none" style={[styles.banner, { bottom: bottomInset + 4, backgroundColor: c.surface }]}>
           <Text style={{ color: c.textMuted, fontSize: 11 }}>{t('app_mock_banner')}</Text>
         </View>

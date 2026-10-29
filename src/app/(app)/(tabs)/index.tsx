@@ -11,11 +11,11 @@ import { RainbowStripe } from '@/components/Rainbow';
 import { Screen } from '@/components/Screen';
 import { Text, useInputFont } from '@/components/Text';
 import { VenueCard } from '@/components/VenueCard';
+import { useUserPosition } from '@/location/useUserPosition';
 import { contrastOutline } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
-
-type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
+import { sportIcon } from '@/utils/sportIcons';
 
 // Espera o usuário parar de digitar antes de buscar.
 function useDebounced<T>(value: T, ms = 350) {
@@ -27,10 +27,10 @@ function useDebounced<T>(value: T, ms = 350) {
   return debounced;
 }
 
-function VenueSection({ title, filters }: { title: string; filters: VenueFilters }) {
+function VenueSection({ title, filters, enabled = true }: { title: string; filters: VenueFilters; enabled?: boolean }) {
   const c = useColors();
   const { t } = useTranslation();
-  const query = useQuery({ queryKey: ['venues', filters], queryFn: () => listVenues(filters) });
+  const query = useQuery({ queryKey: ['venues', filters], queryFn: () => listVenues(filters), enabled });
   const venues = query.data?.data ?? [];
 
   return (
@@ -67,7 +67,7 @@ function SportChip({ sport, selected, onPress }: { sport: Sport; selected: boole
       onPress={onPress}
       style={styles.chip}>
       <View style={[styles.chipCircle, { backgroundColor: selected ? c.selected : c.surface }, contrastOutline(c)]}>
-        <MaterialCommunityIcons name={sport.icon as IconName} size={24} color={selected ? c.onSelected : c.text} />
+        <MaterialCommunityIcons name={sportIcon(sport.icon_path)} size={24} color={selected ? c.onSelected : c.text} />
       </View>
       <Text style={[styles.chipText, { color: c.text, fontWeight: selected ? '700' : '400' }]}>{sport.name}</Text>
       {selected && c.rainbow ? (
@@ -88,6 +88,11 @@ export default function HomeScreen() {
   const q = useDebounced(search.trim()) || undefined;
 
   const sports = useQuery({ queryKey: ['sports'], queryFn: listSports });
+  // "Perto de você" precisa da posição (sort=distance sem lat/lng é 422); sem ela, lista todas.
+  const { position, ready } = useUserPosition();
+  const near: VenueFilters = position
+    ? { q, sport_id: sportId, lat: position.latitude, lng: position.longitude, sort: 'distance' }
+    : { q, sport_id: sportId };
 
   return (
     <Screen contentStyle={styles.content}>
@@ -126,8 +131,9 @@ export default function HomeScreen() {
         contentContainerStyle={styles.chips}
       />
 
-      <VenueSection title={t('app_section_near')} filters={{ q, sport_id: sportId, sort: 'distance' }} />
-      <VenueSection title={t('app_section_top')} filters={{ q, sport_id: sportId, sort: 'rating' }} />
+      <VenueSection title={t(position ? 'app_section_near' : 'app_section_all')} filters={near} enabled={ready} />
+      {/* D33: "Mais avaliadas" virou "Disponíveis agora" (avaliação é vitrine). */}
+      <VenueSection title={t('app_section_available')} filters={{ q, sport_id: sportId, status: 'available' }} />
     </Screen>
   );
 }

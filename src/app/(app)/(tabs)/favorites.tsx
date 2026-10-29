@@ -15,7 +15,7 @@ export default function FavoritesScreen() {
   const c = useColors();
   const { t } = useTranslation();
   const { ids } = useFavorites();
-  const query = useQuery({ queryKey: ['venues', {}], queryFn: () => listVenues({}) });
+  const query = useQuery({ queryKey: ['venues', { per_page: 100 }], queryFn: () => listVenues({ per_page: 100 }) });
   const favorites = (query.data?.data ?? []).filter((v) => ids.has(v.id));
 
   return (

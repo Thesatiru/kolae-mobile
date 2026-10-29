@@ -1,7 +1,6 @@
 import { createShowcaseStore } from './store';
 
-// Vitrine: avaliações ainda não existem na API. A nota e o total exibidos no topo vêm da
-// quadra (API); a lista e as barras por estrela são de exemplo.
+// Vitrine: avaliações não existem na API (D04). Nota, total, lista e barras saem daqui.
 
 export type Review = { id: string; author: string; rating: number; text: string; at: string; mine?: boolean };
 
@@ -24,3 +23,10 @@ export const reviewStore = createShowcaseStore<Review[]>((venueId) =>
     at: daysAgo(3 + i * 6),
   })),
 );
+
+/** Média e total das avaliações de exemplo (inclui as que a pessoa escreveu no app). */
+export function summarizeReviews(reviews: Review[]): { rating: number | null; count: number } {
+  if (!reviews.length) return { rating: null, count: 0 };
+  const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+  return { rating: Math.round((sum / reviews.length) * 10) / 10, count: reviews.length };
+}
