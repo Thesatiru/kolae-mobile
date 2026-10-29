@@ -24,6 +24,7 @@ import { Button } from '@/components/Button';
 import { QueryState } from '@/components/QueryState';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
+import { VenueCover } from '@/components/VenueCover';
 import { useFavorites } from '@/favorites/FavoritesProvider';
 import { useUserPosition } from '@/location/useUserPosition';
 import { reviewStore, summarizeReviews } from '@/showcase/reviews';
@@ -76,12 +77,10 @@ function Photos({ urls, height, name }: { urls: string[]; height: number; name: 
         data={urls}
         keyExtractor={(url) => url}
         renderItem={({ item, index: i }) => (
-          <Image
-            source={item}
+          <VenueCover
+            uri={item}
             style={{ width, height }}
-            contentFit="cover"
-            accessible
-            accessibilityRole="image"
+            logoHeight={height * 0.45}
             accessibilityLabel={t('app_a11y_photo', { index: i + 1, total: urls.length, name })}
           />
         )}
@@ -179,7 +178,12 @@ export default function VenueScreen() {
 
       <View style={[styles.imageBox, { height: imageHeight, backgroundColor: c.surface }]}>
         {venue ? (
-          venue.images.length ? <Photos urls={venue.images} height={imageHeight} name={venue.name} /> : null
+          venue.images.length ? (
+            <Photos urls={venue.images} height={imageHeight} name={venue.name} />
+          ) : (
+            // Sem foto: a logo no lugar, um pouco acima do centro (a folha de baixo cobre a base).
+            <VenueCover uri={null} style={[StyleSheet.absoluteFill, styles.noPhoto]} logoHeight={imageHeight * 0.4} />
+          )
         ) : null}
         <View style={[styles.headerButtons, { top: insets.top + 8 }]} pointerEvents="box-none">
           <CircleButton icon="chevron-left" label={t('app_back')} onPress={() => router.back()} />
@@ -412,6 +416,7 @@ export default function VenueScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   imageBox: { position: 'absolute', top: 0, left: 0, right: 0 },
+  noPhoto: { paddingBottom: 24 },
   headerButtons: { position: 'absolute', left: 20, right: 20, flexDirection: 'row', justifyContent: 'space-between' },
   rightButtons: { flexDirection: 'row', gap: 10 },
   circleButton: {

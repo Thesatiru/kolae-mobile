@@ -1,13 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { VenueSummary } from '@/api/types';
 import { Text } from '@/components/Text';
+import { VenueCover } from '@/components/VenueCover';
 import { useFavorites } from '@/favorites/FavoritesProvider';
-import { usePreferences } from '@/preferences/PreferencesProvider';
 import { useColors } from '@/theme/useColors';
 import { formatPrice, formatPricePerHour, noPriceLabel } from '@/utils/format';
 
@@ -15,7 +14,6 @@ export function VenueCard({ venue, width = 164 }: { venue: VenueSummary; width?:
   const c = useColors();
   const { t } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
-  const { motionReduced } = usePreferences();
   const favorite = isFavorite(venue.id);
 
   // Leitor de tela: o card é lido como uma frase só ("Sesc, grátis") e favoritar vira
@@ -37,8 +35,8 @@ export function VenueCard({ venue, width = 164 }: { venue: VenueSummary; width?:
       onAccessibilityAction={(e) => e.nativeEvent.actionName === 'favorite' && toggle(venue.id)}
       style={({ pressed }) => [{ width, opacity: pressed ? 0.85 : 1 }]}
       onPress={() => router.push({ pathname: '/venue/[id]', params: { id: String(venue.id) } })}>
-      <View style={[styles.imageBox, { width, height: width, backgroundColor: c.surface }]}>
-        <Image source={venue.cover_image_url} style={StyleSheet.absoluteFill} contentFit="cover" transition={motionReduced ? 0 : 150} />
+      <View style={[styles.imageBox, { width, height: width }]}>
+        <VenueCover uri={venue.cover_image_url} style={StyleSheet.absoluteFill} logoHeight={width * 0.45} />
         <Pressable
           accessible={false}
           importantForAccessibility="no-hide-descendants"

@@ -1,6 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
-import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -20,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import type { VenueDetail } from '@/api/types';
 import { getVenue } from '@/api/venues';
 import { Text, useInputFont } from '@/components/Text';
+import { VenueCover } from '@/components/VenueCover';
 import { AUTO_REPLY_DELAY_MS, chatStore, type ChatMessage } from '@/showcase/chat';
 import { contrastOutline } from '@/theme/colors';
 import { useColors } from '@/theme/useColors';
@@ -30,13 +30,11 @@ import { showSoon } from '@/utils/soon';
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
 function VenueAvatar({ venue, size }: { venue: VenueDetail | undefined; size: number }) {
-  const c = useColors();
   return (
-    <Image
-      source={venue?.cover_image_url}
-      accessible={false}
-      style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: c.surface }}
-      contentFit="cover"
+    <VenueCover
+      uri={venue?.cover_image_url}
+      style={{ width: size, height: size, borderRadius: size / 2 }}
+      logoHeight={size * 0.6}
     />
   );
 }

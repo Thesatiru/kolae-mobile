@@ -118,7 +118,8 @@ export default function SettingsScreen() {
       </SettingsGroup>
 
       <SettingsGroup>
-        <SettingsRow icon="help-circle-outline" label={t('app_help_center')} onPress={showSoon} />
+        <SettingsRow icon="school-outline" label={t('app_tour_replay')} onPress={() => router.push('/tour')} />
+        <SettingsRow icon="help-circle-outline" label={t('app_help_center')} onPress={() => router.push('/settings/help')} />
         <SettingsRow icon="file-document-outline" label={t('app_terms')} onPress={showSoon} />
         <SettingsRow icon="shield-outline" label={t('app_privacy_policy')} onPress={showSoon} />
       </SettingsGroup>

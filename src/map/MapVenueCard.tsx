@@ -1,5 +1,3 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { VenueSummary } from '@/api/types';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
-import { usePreferences } from '@/preferences/PreferencesProvider';
+import { VenueCover } from '@/components/VenueCover';
 import { contrastOutline } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
@@ -17,7 +15,6 @@ import { formatDecimal, formatPricePerHour, formatTime } from '@/utils/format';
 export function MapVenueCard({ venue }: { venue: VenueSummary }) {
   const c = useColors();
   const { t } = useTranslation();
-  const { motionReduced } = usePreferences();
 
   const details = [
     venue.sports[0]?.name,
@@ -45,18 +42,7 @@ export function MapVenueCard({ venue }: { venue: VenueSummary }) {
         { backgroundColor: c.background, opacity: pressed ? 0.9 : 1 },
         contrastOutline(c),
       ]}>
-      <View style={[styles.photo, { backgroundColor: c.surface }]}>
-        {venue.cover_image_url ? (
-          <Image
-            source={venue.cover_image_url}
-            style={StyleSheet.absoluteFill}
-            contentFit="cover"
-            transition={motionReduced ? 0 : 150}
-          />
-        ) : (
-          <MaterialCommunityIcons name="soccer-field" size={36} color={c.textMuted} />
-        )}
-      </View>
+      <VenueCover uri={venue.cover_image_url} style={styles.photo} logoHeight={64} />
       <View style={styles.info}>
         <StatusBadge status={venue.status} until={venue.status_until} />
         <Text style={[styles.name, { color: c.text }]} numberOfLines={1}>
@@ -85,7 +71,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
   },
-  photo: { width: 96, height: 112, borderRadius: 14, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  photo: { width: 96, height: 112, borderRadius: 14 },
   info: { flex: 1, justifyContent: 'center', gap: 4 },
   name: { fontSize: 18, fontFamily: fonts.medium },
   details: { fontSize: 13 },
