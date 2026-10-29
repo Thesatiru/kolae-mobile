@@ -92,7 +92,7 @@ engrenagem do perfil. Fluxo da quadra: card → informações → Agendar → st
   `src/theme/colors.ts`. Contraste AA obrigatório: texto sobre botão e link sobre fundo >= 4,5:1.
 - Cores de status (sempre com texto junto, nunca só a cor):
   disponível `#0084FF` (fundo `#E5F2FF`, texto `#0B3A66`),
-  em uso `#D96500` (fundo `#FFF1E5`, texto `#6B2F00`),
+  em uso **vermelho** `#D32F2F` (fundo `#FDECEA`, texto `#7F1D1D`; trocado do laranja em 29/10),
   fechada contorno `#8A8A8A` (fundo `#F1F2F4`, texto `#4A4A4A`).
 - Logo em `src/components/Logo.tsx`: `LogoMark` é o símbolo em SVG (cor por prop) e
   `Logo` é o nome "Kolae" em Kanit.

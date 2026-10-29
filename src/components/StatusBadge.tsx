@@ -6,6 +6,19 @@ import { Text } from '@/components/Text';
 import { statusColors } from '@/theme/colors';
 import { formatTime } from '@/utils/format';
 
+/** Bolinha do status (selo, pinos do mapa e legenda). Fechada é vazada: a cor sozinha não diferencia. */
+export function StatusDot({ status, size = 8, color }: { status: VenueStatus; size?: number; color?: string }) {
+  const accent = color ?? statusColors[status].accent;
+  return (
+    <View
+      style={[
+        { width: size, height: size, borderRadius: size / 2 },
+        status === 'closed' ? { borderWidth: Math.max(2, size / 4), borderColor: accent } : { backgroundColor: accent },
+      ]}
+    />
+  );
+}
+
 // Selo "Disponível · até 19:00" / "Em uso · até 21:00" / "Fechada · abre às 8:00".
 export function StatusBadge({ status, until }: { status: VenueStatus; until: string | null }) {
   const { t } = useTranslation();
@@ -15,13 +28,7 @@ export function StatusBadge({ status, until }: { status: VenueStatus; until: str
 
   return (
     <View accessible style={[styles.badge, { backgroundColor: colors.background }]}>
-      {/* Fechada usa bolinha vazada: a cor sozinha não diferencia o status. */}
-      <View
-        style={[
-          styles.dot,
-          status === 'closed' ? { borderWidth: 2, borderColor: colors.accent } : { backgroundColor: colors.accent },
-        ]}
-      />
+      <StatusDot status={status} />
       <Text style={[styles.text, { color: colors.text }]}>{time ? `${label} · ${time}` : label}</Text>
     </View>
   );
@@ -37,6 +44,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  dot: { width: 8, height: 8, borderRadius: 4 },
   text: { fontSize: 13, fontWeight: '700' },
 });

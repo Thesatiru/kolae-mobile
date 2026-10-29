@@ -173,8 +173,10 @@ export function linkDecoration(c: ThemeColors) {
 }
 
 // Status da quadra: sempre com texto junto, nunca só a cor. Iguais em todos os temas.
+// Em uso é vermelho (decidido em 29/10: "livre x ocupada" como semáforo); #D32F2F tem 5:1
+// com texto branco, para o pino selecionado.
 export const statusColors = {
   available: { accent: '#0084FF', background: '#E5F2FF', text: '#0B3A66' },
-  in_use: { accent: '#D96500', background: '#FFF1E5', text: '#6B2F00' },
+  in_use: { accent: '#D32F2F', background: '#FDECEA', text: '#7F1D1D' },
   closed: { accent: '#8A8A8A', background: '#F1F2F4', text: '#4A4A4A' },
 };

@@ -15,6 +15,7 @@ type Saved = {
   language: Language | null; // null = idioma do celular
   textSize: number; // índice em TEXT_SCALES
   reduceMotion: boolean;
+  useLocation: boolean; // "Usar minha localização" (Configurações › Gerais)
 };
 
 // Pequeno, Padrão, Grande, Muito grande. Multiplica por cima do tamanho de fonte do sistema.
@@ -26,7 +27,6 @@ export type ShowcaseToggle =
   | 'notifyNearbyMatches'
   | 'notifyMatchReminder'
   | 'notifyNews'
-  | 'useLocation'
   | 'photosOnWifi'
   | 'publicProfile'
   | 'showMatches';
@@ -38,6 +38,7 @@ const DEFAULT_SAVED: Saved = {
   language: null,
   textSize: 1,
   reduceMotion: false,
+  useLocation: true,
 };
 
 // Versões antigas salvavam { theme: 'kolae' | 'light' | 'dark' | cor, followSystem }.
@@ -61,7 +62,6 @@ const DEFAULT_SHOWCASE: Record<ShowcaseToggle, boolean> = {
   notifyNearbyMatches: true,
   notifyMatchReminder: true,
   notifyNews: false,
-  useLocation: true,
   photosOnWifi: false,
   publicProfile: true,
   showMatches: true,
@@ -78,6 +78,7 @@ type PreferencesState = Saved & {
   setLanguage: (language: Language) => void;
   setTextSize: (index: number) => void;
   setReduceMotion: (reduce: boolean) => void;
+  setUseLocation: (on: boolean) => void;
   showcase: Record<ShowcaseToggle, boolean>;
   setShowcase: (key: ShowcaseToggle, value: boolean) => void;
 };
@@ -139,6 +140,7 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
       setLanguage: (language) => update({ language }),
       setTextSize: (textSize) => update({ textSize }),
       setReduceMotion: (reduceMotion) => update({ reduceMotion }),
+      setUseLocation: (useLocation) => update({ useLocation }),
       fontScale: TEXT_SCALES[saved.textSize] ?? 1,
       motionReduced: saved.reduceMotion || systemReduceMotion,
       showcase,

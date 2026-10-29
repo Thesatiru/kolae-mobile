@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useColors } from '@/theme/useColors';
 
-// Novas abas (Partidas na S4) entram aqui.
+// Novas abas entram aqui.
 export default function TabsLayout() {
   const { t } = useTranslation();
   const c = useColors();
@@ -13,6 +13,10 @@ export default function TabsLayout() {
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>{t('app_tab_search')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="map">
+        <NativeTabs.Trigger.Label>{t('app_tab_map')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'map', selected: 'map.fill' }} md="map" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="favorites">
         <NativeTabs.Trigger.Label>{t('app_tab_favorites')}</NativeTabs.Trigger.Label>

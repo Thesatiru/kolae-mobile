@@ -6,15 +6,18 @@ import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { SettingsGroup, SettingsRow, SettingsSection } from '@/components/SettingsList';
+import { useEnableLocation } from '@/location/useUserPosition';
 import { usePreferences, type ShowcaseToggle } from '@/preferences/PreferencesProvider';
 
 const RADIUS_OPTIONS_KM = [5, 10, 20, 50];
 
-// Vitrine: notificações, localização, raio e Wi-Fi ainda não mudam nada no app.
-// "Limpar cache" é real: apaga as fotos de quadras guardadas pelo expo-image.
+// Vitrine: notificações, raio e Wi-Fi ainda não mudam nada no app.
+// Reais: "Usar minha localização" (home, mapa e distância) e "Limpar cache" (apaga as fotos
+// de quadras guardadas pelo expo-image).
 export default function GeneralSettingsScreen() {
   const { t } = useTranslation();
-  const { showcase, setShowcase } = usePreferences();
+  const { showcase, setShowcase, useLocation, setUseLocation } = usePreferences();
+  const enableLocation = useEnableLocation();
   const [radius, setRadius] = useState(10);
 
   const toggle = (key: ShowcaseToggle) => ({
@@ -56,7 +59,12 @@ export default function GeneralSettingsScreen() {
 
       <SettingsSection title={t('app_location')} />
       <SettingsGroup>
-        <SettingsRow label={t('app_use_location')} description={t('app_use_location_desc')} {...toggle('useLocation')} />
+        <SettingsRow
+          label={t('app_use_location')}
+          description={t('app_use_location_desc')}
+          switchValue={useLocation}
+          onSwitch={(on) => (on ? void enableLocation() : setUseLocation(false))}
+        />
         <SettingsRow label={t('app_search_radius')} value={`${radius} km`} onPress={nextRadius} />
       </SettingsGroup>
 
