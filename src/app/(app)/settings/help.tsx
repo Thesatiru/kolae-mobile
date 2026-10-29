@@ -38,7 +38,8 @@ export default function HelpScreen() {
   // Nomes reais de abas, botões e telas, para a resposta bater com o que a pessoa vê.
   const names = {
     search: t('app_tab_search'),
-    profile: t('app_tab_profile'),
+    menu: t('app_tab_menu'),
+    settings: t('app_settings'),
     talk: t('app_talk_to_owner'),
     forgot: t('app_forgot'),
     appearance: t('app_appearance'),

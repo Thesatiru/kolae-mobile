@@ -41,6 +41,15 @@ export default function ProfileScreen() {
     <ScrollView style={{ backgroundColor: c.background }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View style={{ height: coverHeight, backgroundColor: c.primary }}>
         <Image source={profileShowcase.coverUrl} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
+        {/* Abre pelo Menu, por cima das abas: precisa do voltar. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('app_back')}
+          hitSlop={10}
+          onPress={() => router.back()}
+          style={[styles.back, { top: insets.top + 8 }]}>
+          <MaterialCommunityIcons name="chevron-left" size={32} color="#FFFFFF" style={styles.iconShadow} />
+        </Pressable>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('app_settings')}
@@ -111,6 +120,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  back: { position: 'absolute', left: 14 },
   gear: { position: 'absolute', right: 20 },
   iconShadow: { textShadowColor: 'rgba(0,0,0,0.45)', textShadowRadius: 4 },
   avatar: {

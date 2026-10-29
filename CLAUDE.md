@@ -46,7 +46,9 @@ detalhe da quadra, status e agenda.
 **Real a partir da S5:** alterar e-mail com código (D11). Até lá a tela usa mock.
 
 **Vitrine** (só visual, aviso "Prévia", nada chama a API): duas etapas,
-seguidores/feed/vitórias/PRO no perfil, chat com a quadra, avaliações, favoritos (D04).
+seguidores/feed/vitórias/PRO no perfil, chat com a quadra, avaliações, favoritos (D04) e a
+**Comunidade** (rede social do esporte: feed Para você/Amigos, novo post e comentários; posts
+aceitam texto e foto, nunca links; respostas só texto). Dados em `src/showcase/community.ts`.
 Dados em `src/showcase/` e `src/profile/showcase.ts`, em memória.
 
 ## Como o app consome a API
@@ -77,8 +79,11 @@ Dados em `src/showcase/` e `src/profile/showcase.ts`, em memória.
 Design aprovado no canvas "Kolae – Novas telas" (link com o Rafael); prints em `design/`,
 na raiz do projeto. **Antes de implementar uma tela, abra a imagem dela em `design/`.**
 
-Navegação: abas **Pesquisar, Mapa, Favoritos, Perfil**. Configurações abrem pela
-engrenagem do perfil. Fluxo da quadra: card → informações → Agendar → status e agenda.
+Navegação (decidida em 29/10): abas **Pesquisar, Mapa, Comunidade e Menu (☰)**. Perfil,
+Favoritos, Configurações, Central de ajuda e o tutorial abrem pelo Menu (cada um com uma
+descrição curta), como nos apps que guardam curtidas e salvos fora da barra. Comunidade = rede
+social do esporte (vitrine). Fluxo da quadra: card → informações → Agendar →
+status e agenda.
 
 ## Identidade visual
 
@@ -137,7 +142,8 @@ design/                      prints das telas aprovadas (referência, não vai n
 src/app/_layout.tsx          fontes, splash e providers
 src/app/(auth)/              login, cadastro, esqueci a senha (só sem sessão)
 src/app/(app)/_layout.tsx    exige sessão; Stack sem header
-src/app/(app)/(tabs)/        abas nativas
+src/app/(app)/(tabs)/        abas nativas: index (Pesquisar), map, community, menu
+src/app/(app)/profile, favorites, tour   abrem pelo Menu, por cima das abas
 src/app/(app)/venue/[id]     informações da quadra
 src/app/(app)/settings/      configurações: index, general, privacy, appearance, change-password
 src/app/(app)/chat/[id]      vitrine

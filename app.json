@@ -42,6 +42,12 @@
       "expo-localization",
       "expo-font",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Kolae usa suas fotos para você anexar imagens nos posts da Comunidade."
+        }
+      ],
+      [
         "expo-location",
         {
           "locationWhenInUsePermission": "O Kolae usa sua localização para mostrar as quadras perto de você e a distância até cada uma."

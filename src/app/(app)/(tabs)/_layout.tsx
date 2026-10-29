@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useColors } from '@/theme/useColors';
 
-// Novas abas entram aqui.
+// Só as abas principais; perfil, favoritos, configurações e ajuda ficam na aba Menu.
 export default function TabsLayout() {
   const { t } = useTranslation();
   const c = useColors();
@@ -18,13 +18,13 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Label>{t('app_tab_map')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: 'map', selected: 'map.fill' }} md="map" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="favorites">
-        <NativeTabs.Trigger.Label>{t('app_tab_favorites')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: 'heart', selected: 'heart.fill' }} md="favorite" />
+      <NativeTabs.Trigger name="community">
+        <NativeTabs.Trigger.Label>{t('app_tab_community')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'person.3', selected: 'person.3.fill' }} md="groups" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile">
-        <NativeTabs.Trigger.Label>{t('app_tab_profile')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="person" md="person" />
+      <NativeTabs.Trigger name="menu">
+        <NativeTabs.Trigger.Label>{t('app_tab_menu')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="line.3.horizontal" md="menu" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

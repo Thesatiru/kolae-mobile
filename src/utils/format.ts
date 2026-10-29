@@ -64,6 +64,17 @@ export function formatRating(rating: number | null): string {
   return rating === null ? '–' : formatDecimal(rating);
 }
 
+/** Tempo desde a data, curto como nas redes: "agora", "12 min", "3 h", "ontem", "2 dias". */
+export function formatAgo(iso: string): string {
+  const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (minutes < 1) return i18n.t('app_time_now');
+  if (minutes < 60) return i18n.t('app_time_minutes', { count: minutes });
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return i18n.t('app_time_hours', { count: hours });
+  const days = Math.floor(hours / 24);
+  return days === 1 ? i18n.t('app_time_yesterday') : i18n.t('app_time_days', { count: days });
+}
+
 /** "2025-10-01" -> meses completos até hoje. */
 export function monthsSince(isoDate: string): number {
   const from = new Date(isoDate);

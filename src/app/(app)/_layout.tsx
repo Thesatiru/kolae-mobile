@@ -31,6 +31,8 @@ export default function AppLayout() {
         name="tour"
         options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: motionReduced ? 'none' : 'fade' }}
       />
+      {/* Novo post da Comunidade sobe por cima, como nas redes sociais. */}
+      <Stack.Screen name="post/new" options={{ presentation: 'modal', animation: motionReduced ? 'none' : 'slide_from_bottom' }} />
     </Stack>
   );
 }

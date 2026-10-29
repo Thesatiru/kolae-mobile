@@ -3,16 +3,13 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { listVenues } from '@/api/venues';
+import { PageHeader } from '@/components/PageHeader';
 import { QueryState } from '@/components/QueryState';
 import { Screen } from '@/components/Screen';
-import { Text } from '@/components/Text';
 import { VenueCard } from '@/components/VenueCard';
 import { useFavorites } from '@/favorites/FavoritesProvider';
-import { fonts } from '@/theme/fonts';
-import { useColors } from '@/theme/useColors';
 
 export default function FavoritesScreen() {
-  const c = useColors();
   const { t } = useTranslation();
   const { ids } = useFavorites();
   const query = useQuery({ queryKey: ['venues', { per_page: 100 }], queryFn: () => listVenues({ per_page: 100 }) });
@@ -20,7 +17,7 @@ export default function FavoritesScreen() {
 
   return (
     <Screen contentStyle={styles.content}>
-      <Text accessibilityRole="header" style={[styles.title, { color: c.text }]}>{t('app_tab_favorites')}</Text>
+      <PageHeader title={t('app_tab_favorites')} />
       <QueryState
         loading={query.isPending}
         error={query.error}
@@ -40,6 +37,5 @@ export default function FavoritesScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 20 },
-  title: { fontSize: 28, fontFamily: fonts.medium },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
 });

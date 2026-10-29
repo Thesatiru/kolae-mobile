@@ -41,7 +41,7 @@ export default function TourScreen() {
     search: t('app_tab_search'),
     map: t('app_tab_map'),
     favorites: t('app_tab_favorites'),
-    profile: t('app_tab_profile'),
+    menu: t('app_tab_menu'),
     available: t('app_section_available'),
     schedule: t('app_schedule'),
   };
@@ -187,7 +187,7 @@ function Visual({ step }: { step: Step }) {
     case 'yours':
       return (
         <View style={styles.row}>
-          {(['heart', 'cog-outline', 'format-size', 'palette-outline'] as IconName[]).map((icon) => (
+          {(['menu', 'heart', 'cog-outline', 'format-size'] as IconName[]).map((icon) => (
             <View key={icon} style={[styles.sportCircle, { backgroundColor: c.background }]}>
               <MaterialCommunityIcons name={icon} size={26} color={icon === 'heart' ? c.primary : c.text} />
             </View>
