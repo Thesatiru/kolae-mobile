@@ -8,9 +8,11 @@
     "scheme": "kolae",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "infoPlist": {}
     },
     "android": {
+      "package": "com.kolae.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#0084FF",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -38,11 +40,28 @@
       ],
       "expo-secure-store",
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O Kolae usa sua localização para mostrar as quadras perto de você e a distância até cada uma."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "8c448852-a439-4b3e-a5b2-d90d271ac858"
+      }
+    },
+    "owner": "satiru"
   }
 }
