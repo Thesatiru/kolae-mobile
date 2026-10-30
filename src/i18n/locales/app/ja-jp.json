@@ -342,5 +342,7 @@
   "app_a11y_slot": "{{start}}〜{{end}}：{{status}}",
   "app_a11y_slot_past": "終了",
   "app_rent_direct": "オーナーと直接レンタル",
+  "app_accept_terms_required": "アカウントを作成するには、利用規約とプライバシーポリシーに同意してください。",
+  "app_legal_hint": "サイトのページを開きます（ポルトガル語）",
   "app_profile_feed": "投稿："
 }

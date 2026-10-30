@@ -342,5 +342,7 @@
   "app_a11y_slot": "{{start}} से {{end}} तक: {{status}}",
   "app_a11y_slot_past": "बीत चुका",
   "app_rent_direct": "मालिक से सीधे किराया",
+  "app_accept_terms_required": "खाता बनाने के लिए उपयोग की शर्तें और गोपनीयता नीति स्वीकार करें।",
+  "app_legal_hint": "वेबसाइट का पेज खोलता है (पुर्तगाली में)",
   "app_profile_feed": "पोस्ट:"
 }

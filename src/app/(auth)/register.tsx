@@ -8,6 +8,7 @@ import { toApiError } from '@/api/errors';
 import { useAuth } from '@/auth/AuthProvider';
 import { isOldEnough, MIN_AGE, PASSWORD_MIN_LENGTH } from '@/auth/rules';
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { LogoMark } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
@@ -16,6 +17,7 @@ import { linkDecoration } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
 import { brDateToIso, maskDate } from '@/utils/date';
+import { openLegal, PRIVACY_URL, TERMS_URL } from '@/utils/legal';
 
 type Field = 'name' | 'email' | 'birthdate' | 'password' | 'password_confirmation';
 type Errors = Partial<Record<Field, string>>;
@@ -38,6 +40,9 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Como no site: só cria a conta quem aceita os termos e a política (LGPD).
+  const [accepted, setAccepted] = useState(false);
+  const [termsError, setTermsError] = useState<string | null>(null);
 
   const set = (field: Field) => (value: string) =>
     setForm((f) => ({ ...f, [field]: field === 'birthdate' ? maskDate(value) : value }));
@@ -59,7 +64,8 @@ export default function RegisterScreen() {
     const local = validate();
     setErrors(local);
     setFormError(null);
-    if (Object.keys(local).length) return;
+    setTermsError(accepted ? null : t('app_accept_terms_required'));
+    if (Object.keys(local).length || !accepted) return;
 
     setLoading(true);
     try {
@@ -138,6 +144,39 @@ export default function RegisterScreen() {
           error={errors.password_confirmation}
         />
 
+        <View style={styles.terms}>
+          <Checkbox
+            checked={accepted}
+            onChange={(v) => {
+              setAccepted(v);
+              if (v) setTermsError(null);
+            }}
+            label={t('register_accept_agree')}
+          />
+          <View style={styles.termsLinks}>
+            <Text
+              accessibilityRole="link"
+              accessibilityHint={t('app_legal_hint')}
+              onPress={() => openLegal(TERMS_URL, c)}
+              style={[styles.termsLink, { color: c.link }]}>
+              {t('app_terms')}
+            </Text>
+            <Text style={{ color: c.textMuted }}>·</Text>
+            <Text
+              accessibilityRole="link"
+              accessibilityHint={t('app_legal_hint')}
+              onPress={() => openLegal(PRIVACY_URL, c)}
+              style={[styles.termsLink, { color: c.link }]}>
+              {t('app_privacy_policy')}
+            </Text>
+          </View>
+          {termsError ? (
+            <Text accessibilityLiveRegion="polite" style={{ color: c.danger, fontSize: 14 }}>
+              {termsError}
+            </Text>
+          ) : null}
+        </View>
+
         {formError ? <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={[styles.error, { color: c.danger }]}>{formError}</Text> : null}
 
         <Button title={t('register_create_btn')} onPress={handleRegister} loading={loading} />
@@ -180,4 +219,8 @@ const styles = StyleSheet.create({
   link: { fontSize: 15, fontFamily: fonts.regular },
   error: { textAlign: 'center' },
   footer: { alignItems: 'center', gap: 2, marginTop: 4 },
+  terms: { gap: 10 },
+  termsLinks: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 28 },
+  // Links sempre sublinhados: no meio do formulário, a cor sozinha não diz que dá para tocar.
+  termsLink: { fontSize: 15, textDecorationLine: 'underline', paddingVertical: 6 },
 });

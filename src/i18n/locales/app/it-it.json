@@ -342,5 +342,7 @@
   "app_a11y_slot": "Dalle {{start}} alle {{end}}: {{status}}",
   "app_a11y_slot_past": "già passato",
   "app_rent_direct": "Affitto diretto con il proprietario",
+  "app_accept_terms_required": "Per creare l'account, accetta i termini di utilizzo e l'informativa sulla privacy.",
+  "app_legal_hint": "Apre la pagina del sito (in portoghese)",
   "app_profile_feed": "Post:"
 }

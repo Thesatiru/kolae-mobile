@@ -342,5 +342,7 @@
   "app_a11y_slot": "Das {{start}} às {{end}}: {{status}}",
   "app_a11y_slot_past": "já passou",
   "app_rent_direct": "Aluguel direto com o dono",
+  "app_accept_terms_required": "Para criar a conta, aceite os termos de uso e a política de privacidade.",
+  "app_legal_hint": "Abre a página do site",
   "app_profile_feed": "Feed:"
 }
