@@ -2,7 +2,7 @@
 
 App mobile do Kolae: encontrar **quadras privadas**, ver se estão livres e falar com o
 dono para alugar. Projeto Integrador da Fatec Ferraz de Vasconcelos.
-Entrega em **5 de dezembro de 2026**; congelamento de features em **29/11**.
+Entrega em **28 de novembro de 2026**; congelamento de funcionalidades em **21/11** (D28).
 
 - Rafael: este app (React Native + Expo), repositório `Thesatiru/kolae-mobile`.
 - João: backend PHP (`/api/v1`) e o site, repositório `Slengm4n/Kolae`.
@@ -17,10 +17,10 @@ coisa que fale com a API, leia:
 
 - Contrato: https://github.com/Slengm4n/Kolae/blob/main/docs/api.md
 - Decisões (D01, D02...): https://github.com/Slengm4n/Kolae/blob/main/docs/decisoes.md
-- Status, horário de funcionamento e agenda (S3/S4):
+- Status, horário de funcionamento e agenda:
   https://github.com/Slengm4n/Kolae/blob/main/docs/modelo-status.md
 - Índice e cronograma dos dois: https://github.com/Slengm4n/Kolae/blob/main/docs/README.md
-- Rodar o backend local e conectar o app: https://github.com/Slengm4n/Kolae/blob/main/docs/setup.md
+- Rodar o backend local: https://github.com/Slengm4n/Kolae/blob/main/docs/setup.md
 
 Se o app precisar de algo que não está no contrato, **não invente o formato**: anote como
 pendência para combinar com o João, e use mock até lá.
@@ -33,7 +33,7 @@ pendência para combinar com o João, e use mock até lá.
   `available` (Disponível), `in_use` (Em uso), `closed` (Fechada), com `status_until`
   (quando o status muda). `status_until` pode vir `null` (dono fechou sem data).
 - O aluguel é combinado com o dono: "Falar com o dono" abre `https://wa.me/<owner.whatsapp>`.
-  Se `owner.whatsapp` vier `null`, o botão não aparece.
+  Se `owner.whatsapp` vier `null`, o botão não aparece (D24).
 - Detalhe da quadra: informações (rework aprovado) e o botão **Agendar**, que abre a tela de
   status + agenda do dia. Quem alugou não aparece no app (privacidade).
 
@@ -43,21 +43,23 @@ pendência para combinar com o João, e use mock até lá.
 data de nascimento só leitura, D09), alterar senha, mapa e busca de quadras com filtros,
 detalhe da quadra, status e agenda.
 
-**Real a partir da S5:** alterar e-mail com código (D11). Até lá a tela usa mock.
-
-**Vitrine** (só visual, aviso "Prévia", nada chama a API): duas etapas,
-seguidores/feed/vitórias/PRO no perfil, chat com a quadra, avaliações, favoritos (D04) e a
-**Comunidade** (rede social do esporte: feed Para você/Amigos, novo post e comentários; posts
-aceitam texto e foto, nunca links; respostas só texto). Dados em `src/showcase/community.ts`.
-Dados em `src/showcase/` e `src/profile/showcase.ts`, em memória.
+**Vitrine** (só visual, aviso "Prévia", nada chama a API): alterar e-mail com código (fora do
+escopo da entrega, D28), duas etapas, seguidores/feed/vitórias/PRO no perfil, chat com a
+quadra, avaliações, favoritos (D04) e a **Comunidade** (rede social do esporte: feed Para
+você/Amigos, novo post e comentários; posts aceitam texto e foto, nunca links; respostas só
+texto). No perfil, capa, seguidores, vitórias, posts e fotos também são vitrine e saem da
+Comunidade (sem posts, o perfil fica vazio). Dados em `src/showcase/` (a Comunidade em
+`src/showcase/community.ts`), em memória.
 
 ## Como o app consome a API
 
-- **Base URL:** até a migração de hospedagem, o backend roda no notebook do João (D13):
-  `http://<IP do notebook>:8080/kolae/api/v1`, na mesma rede Wi-Fi. A produção
-  (InfinityFree) não funciona para o app.
+- **Base URL: a produção, `https://kolae.online/api/v1`** (HostGator, D41), inclusive pelo
+  4G e na apresentação. O backend local (`http://localhost/kolae/api/v1` no PC do Rafael, ou
+  `http://<IP do notebook>:8080/kolae/api/v1` no do João) serve **só para testar uma mudança
+  antes do deploy**. A `main` do João publica direto na produção.
 - **Mock por área:** `EXPO_PUBLIC_MOCK_AUTH` e `EXPO_PUBLIC_MOCK_VENUES` (`true` = mock).
-  Cada função de `src/api/` escolhe real ou mock pelo interruptor da sua área.
+  Cada função de `src/api/` escolhe real ou mock pelo interruptor da sua área. Com a
+  produção no ar, o normal é os dois em `false`.
 - **Erros:** `ApiRequestError` tem `status`, `code`, `message` e `fieldErrors`.
   Mostrar `field()` embaixo do input; sem erro de campo, `message`.
 - **Deslogar só em erro de token** (D10): `AUTH_MISSING_TOKEN`, `AUTH_INVALID_FORMAT`,
@@ -69,8 +71,14 @@ Dados em `src/showcase/` e `src/profile/showcase.ts`, em memória.
   traduz com `app_floor_<chave>`.
 - **Esportes:** a API manda `icon_path` do Font Awesome (`fa-futbol`); o app converte para
   MaterialCommunityIcons numa tabela, com ícone padrão quando não conhecer.
+- **Preço:** `0` = "Grátis", `null` = "Preço não informado" (D31).
+- **Fotos:** `cover_image_url`, `images` e `avatar_url` podem vir `null` (ou fora da lista)
+  quando o arquivo não existe no servidor: mostrar a imagem padrão.
+- **Descrição:** `description` `null` esconde a seção "Sobre a quadra" (D30).
+- **Distância no detalhe:** calculada no app com a posição da pessoa e as coordenadas (D33).
 - **Agenda:** dia sem funcionamento vem com `opens_at`/`closes_at` `null` e `slots` vazio:
-  mostrar "Fechada neste dia". Faixas que já passaram aparecem mais apagadas.
+  mostrar "Fechada neste dia". `opening_hours` vazio no detalhe = "Horário não informado"
+  (D23). Faixas que já passaram aparecem mais apagadas.
 - **Fuso:** tudo em horário de Brasília (D16). Mostrar horas com o fuso que vem na data.
 - O app envia `Accept-Language`; a API ainda responde em português (melhoria futura).
 
@@ -126,9 +134,12 @@ status e agenda.
   `src/i18n/locales/site/`, do app (prefixo `app_`) em `src/i18n/locales/app/`.
   **Toda chave nova vai nos 7 arquivos do app.** Não remover `lowerCaseLng: true`.
 - Ícones: `@expo/vector-icons` (MaterialCommunityIcons); imagens com `expo-image`
-- Mapa (S3): `react-native-maps` + `expo-location`. No APK precisa de chave própria do
-  Google Maps (Maps SDK for Android), senão o mapa fica cinza.
-- APK de teste com a API local: liberar tráfego `http://` no build.
+- Mapa: `react-native-maps` + `expo-location`. No APK precisa de **chave própria do Google
+  Maps para Android** (Maps SDK for Android, restrita ao pacote do app e à assinatura do
+  build), senão o mapa fica cinza. A chave do site (`kolae.online`) é outra.
+- APK: a produção é `https://`, então **não precisa liberar tráfego HTTP**. Só seria preciso
+  para um APK apontando para o backend local.
+- Build: EAS (perfil `preview` para APK de teste).
 - Ambiente do desenvolvedor: Linux, testes no celular pelo Expo Go
 
 Antes de usar qualquer API do Expo, confira a documentação da versão 58
@@ -143,9 +154,13 @@ src/app/_layout.tsx          fontes, splash e providers
 src/app/(auth)/              login, cadastro, esqueci a senha (só sem sessão)
 src/app/(app)/_layout.tsx    exige sessão; Stack sem header
 src/app/(app)/(tabs)/        abas nativas: index (Pesquisar), map, community, menu
-src/app/(app)/profile, favorites, tour   abrem pelo Menu, por cima das abas
+src/app/(app)/profile/       perfil (index) e editar perfil (edit); abre pelo Menu
+src/app/(app)/user/[handle]  perfil de outra pessoa (vitrine), pela foto num post
+src/app/(app)/favorites, tour   abrem pelo Menu, por cima das abas
 src/app/(app)/venue/[id]     informações da quadra
-src/app/(app)/settings/      configurações: index, general, privacy, appearance, change-password
+src/app/(app)/settings/      configurações: index, general, privacy, appearance,
+                             change-password, help
+src/app/(app)/post/          vitrine da Comunidade: [id] e new
 src/app/(app)/chat/[id]      vitrine
 src/app/(app)/reviews/[id]   vitrine
 src/api/                     uma função por endpoint, real ou mock; mocks em src/api/mocks/
@@ -153,7 +168,8 @@ src/api/types.ts             tipos do contrato (seguir docs/api.md do João)
 src/api/errors.ts            ApiRequestError
 src/auth/                    AuthProvider, useAuth(), token
 src/preferences/             cor, modo, tamanho do texto, fonte de leitura fácil, movimento
-src/showcase/, src/profile/  dados de vitrine
+src/showcase/                dados de vitrine
+src/profile/                 ProfileView (próprio perfil e de outra pessoa), trocar a foto
 src/components/              Text, Button, TextField, Screen, PageHeader, SettingsList,
                              StatusBadge, VenueCard, QueryState, Logo, CurvedHeader...
 src/theme/                   cores e useColors()
@@ -175,28 +191,23 @@ tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 - Rodar `npx tsc --noEmit` antes de considerar uma tarefa pronta.
 - Um commit por etapa concluída.
 
-## Pendências da S2 no app
+## Pendências
 
-O backend da S2 já está pronto (adiantado). Falta no app:
+Em ordem de prioridade. Apague o item quando terminar.
 
-1. Separar o mock em `EXPO_PUBLIC_MOCK_AUTH` e `EXPO_PUBLIC_MOCK_VENUES`.
-2. `code` em `ApiRequestError` e deslogar só nos erros de token.
-3. `token_type` e `expires_at` no login; `per_page` na paginação.
-4. Senha mínima de 8 e validação dos 18 anos no cadastro (7 idiomas).
-5. Chaves de piso da API e conversão do `icon_path` dos esportes.
-6. Editar nome (`PATCH /me`, sem `birthdate`) e trocar foto (`POST /me/avatar`).
-7. Alterar senha ligada à API (`PUT /me/password`).
-8. Testar tudo com o backend do João; depois, primeiro APK de teste.
+1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
+   testar pelo 4G.
+2. **Estados de erro, vazio e sem conexão** em todas as telas que usam a API (S5).
+3. Revisar as vitrines com o aviso "Prévia" (S5).
 
-## Cronograma do app
+## Cronograma (igual ao docs/README.md do João)
 
-| Semana | Entrega |
-|---|---|
-| S1 · 26/10–01/11 | Base, navegação, temas, i18n, acessibilidade, telas com mock ✔ |
-| S2 · 02/11–08/11 | Login, cadastro, perfil e senha na API real; primeiro APK |
-| S3 · 09/11–15/11 | Aba Mapa com status, filtros e busca; chave do Google Maps |
-| S4 · 16/11–22/11 | Informações da quadra, Agendar, status e agenda; "Falar com o dono" |
-| S5 · 23/11–29/11 | Troca de e-mail real; vitrines; erro, vazio e sem conexão; polimento |
-| S6 · 30/11–05/12 | Só correções, testes em aparelhos reais, APK final, ensaio |
+| Sprint | App (Rafael) | Pronto quando |
+|---|---|---|
+| S1 · 26/10–28/10 | Base, navegação, temas, i18n, acessibilidade, telas com mock ✔ | |
+| S2–S3 · 29/10–08/11 | Login, cadastro, perfil e configurações na API real; mapa com status ✔; primeiro APK | Quadra do site aparece no app com status |
+| S4 · 09/11–15/11 | Mapa e detalhe com a API real, agenda do dia, "Falar com o dono" | Status muda sozinho no app |
+| S5 · 16/11–21/11 | Vitrines, estados de erro e vazio | **Congelamento em 21/11** |
+| S6 · 22/11–28/11 | Correções, APK final, ensaio | **Entrega em 28/11** |
 
 Cadastro e edição de quadras e o agendamento de partidas ficam só no site.
