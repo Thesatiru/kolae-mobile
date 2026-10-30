@@ -1,6 +1,6 @@
 import { isOldEnough, PASSWORD_MIN_LENGTH } from '@/auth/rules';
 import { ApiRequestError } from '../errors';
-import type { AuthResponse, ChangePasswordInput, LoginInput, RegisterInput, User } from '../types';
+import type { AuthResponse, ChangePasswordInput, LoginInput, RegisterInput, UpdateMeInput, UploadFile, User } from '../types';
 import { delay } from './delay';
 
 // Usuário de teste: teste@kolae.com / 12345678
@@ -110,4 +110,24 @@ export async function mockChangePassword(token: string, input: ChangePasswordInp
   passwordErrors(input.password, input.password_confirmation, errors);
   validationError(errors);
   user.password = input.password;
+}
+
+const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+
+export async function mockUploadAvatar(token: string, file: UploadFile): Promise<User> {
+  await delay(900);
+  const user = userFromToken(token);
+  if (!AVATAR_TYPES.includes(file.type)) validationError({ avatar: ['Envie uma imagem JPG, PNG ou GIF.'] });
+  user.avatar_url = file.uri; // no mock, a própria foto do celular
+  return strip(user);
+}
+
+export async function mockUpdateMe(token: string, input: UpdateMeInput): Promise<User> {
+  await delay();
+  const user = userFromToken(token);
+  const name = input.name.trim();
+  if (!name) validationError({ name: ['O nome é obrigatório.'] });
+  else if (name.length > 255) validationError({ name: ['Use até 255 caracteres.'] });
+  user.name = name;
+  return strip(user);
 }

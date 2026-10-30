@@ -11,11 +11,12 @@ import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { SettingsGroup, SettingsRow } from '@/components/SettingsList';
 import { Text } from '@/components/Text';
+import { UserAvatar } from '@/components/UserAvatar';
 import { languages } from '@/i18n';
 import { usePreferences } from '@/preferences/PreferencesProvider';
 import { contrastOutline } from '@/theme/colors';
 import { useColors } from '@/theme/useColors';
-import { initials } from '@/utils/format';
+import { openLegal, PRIVACY_URL, TERMS_URL } from '@/utils/legal';
 import { showSoon } from '@/utils/soon';
 
 export default function SettingsScreen() {
@@ -43,15 +44,12 @@ export default function SettingsScreen() {
     <Screen contentStyle={styles.content}>
       <PageHeader title={t('app_settings')} />
 
-      {/* Editar perfil entra numa próxima etapa. */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${user?.name}, ${user?.email}, ${t('app_edit_profile')}`}
-        onPress={showSoon}
+        onPress={() => router.push('/profile/edit')}
         style={({ pressed }) => [styles.profile, { backgroundColor: c.surface, opacity: pressed ? 0.6 : 1 }, contrastOutline(c)]}>
-        <View style={[styles.avatar, { backgroundColor: c.primary }]}>
-          <Text style={[styles.avatarText, { color: c.onPrimary }]}>{initials(user?.name ?? '')}</Text>
-        </View>
+        <UserAvatar user={user} size={50} />
         <View style={styles.flex}>
           <Text style={[styles.name, { color: c.text }]} numberOfLines={1}>
             {user?.name}
@@ -120,8 +118,8 @@ export default function SettingsScreen() {
       <SettingsGroup>
         <SettingsRow icon="school-outline" label={t('app_tour_replay')} onPress={() => router.push('/tour')} />
         <SettingsRow icon="help-circle-outline" label={t('app_help_center')} onPress={() => router.push('/settings/help')} />
-        <SettingsRow icon="file-document-outline" label={t('app_terms')} onPress={showSoon} />
-        <SettingsRow icon="shield-outline" label={t('app_privacy_policy')} onPress={showSoon} />
+        <SettingsRow icon="file-document-outline" label={t('app_terms')} onPress={() => openLegal(TERMS_URL, c)} />
+        <SettingsRow icon="shield-outline" label={t('app_privacy_policy')} onPress={() => openLegal(PRIVACY_URL, c)} />
       </SettingsGroup>
 
       <View style={styles.spacer} />
@@ -135,8 +133,6 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: 16, paddingBottom: 32, gap: 16 },
   flex: { flex: 1 },
   profile: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: 22, padding: 16 },
-  avatar: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 18, fontWeight: '700' },
   name: { fontSize: 18, fontWeight: '700' },
   languages: { marginHorizontal: 10, marginBottom: 10, borderRadius: 14, overflow: 'hidden' },
   language: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14 },

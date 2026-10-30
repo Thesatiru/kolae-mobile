@@ -21,7 +21,7 @@ import { useAuth } from '@/auth/AuthProvider';
 import { Avatar, PreviewBanner } from '@/community/parts';
 import { Text, useInputFont } from '@/components/Text';
 import { usePreferences } from '@/preferences/PreferencesProvider';
-import { hasLink, postStore, showcaseVenues } from '@/showcase/community';
+import { handleFor, hasLink, postStore, showcaseVenues } from '@/showcase/community';
 import { contrastOutline } from '@/theme/colors';
 import { useColors } from '@/theme/useColors';
 
@@ -54,7 +54,7 @@ export default function NewPostScreen() {
     postStore.set(0, (list) => [
       {
         id: Date.now(),
-        author: { ...author, handle: user.email.split('@')[0].replace(/[^a-z0-9_]/gi, '').toLowerCase() },
+        author: { ...author, handle: handleFor(user.name) },
         text: text.trim(),
         at: new Date().toISOString(),
         imageUrl: imageUri ?? undefined,

@@ -36,7 +36,7 @@ export default function PrivacyScreen() {
           icon="account-outline"
           label={t('app_personal_data')}
           description={t('app_personal_data_desc')}
-          onPress={showSoon}
+          onPress={() => router.push('/profile/edit')}
         />
       </SettingsGroup>
 

@@ -12,6 +12,7 @@ type AuthState = {
   signIn: (input: LoginInput, remember: boolean) => Promise<void>;
   signUp: (input: RegisterInput) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUser: (user: User) => void; // depois de editar o perfil ou trocar a foto (a API devolve o user novo)
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -54,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, signIn, signUp, signOut }),
+    () => ({ user, loading, signIn, signUp, signOut, updateUser: setUser }),
     [user, loading, signIn, signUp, signOut],
   );
 

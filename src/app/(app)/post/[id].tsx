@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/auth/AuthProvider';
 import { PostCard } from '@/community/PostCard';
 import { Avatar, PreviewBanner } from '@/community/parts';
+import { useOpenProfile } from '@/community/useOpenProfile';
 import { PageHeader } from '@/components/PageHeader';
 import { Text, useInputFont } from '@/components/Text';
-import { commentStore, hasLink, postStore, type Comment } from '@/showcase/community';
+import { commentStore, handleFor, hasLink, postStore, type Comment } from '@/showcase/community';
 import { useColors } from '@/theme/useColors';
 import { formatAgo } from '@/utils/format';
 
@@ -41,7 +42,7 @@ export default function PostScreen() {
       ...list,
       {
         id: `mine-${Date.now()}`,
-        author: { ...me, handle: user.email.split('@')[0] },
+        author: { ...me, handle: handleFor(user.name) },
         text,
         at: new Date().toISOString(),
         likes: 0,
@@ -125,9 +126,16 @@ function CommentRow({ comment, onLike }: { comment: Comment; onLike: () => void 
   const c = useColors();
   const { t } = useTranslation();
   const time = formatAgo(comment.at);
+  const openProfile = useOpenProfile();
   return (
     <View style={styles.comment}>
-      <Avatar author={comment.author} size={38} />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('app_a11y_open_profile', { name: comment.author.name })}
+        hitSlop={6}
+        onPress={() => openProfile(comment.author.handle)}>
+        <Avatar author={comment.author} size={38} />
+      </Pressable>
       <View accessible accessibilityLabel={`${comment.author.name}, ${time}: ${comment.text}`} style={styles.flex}>
         <Text>
           <Text style={[styles.commentName, { color: c.text }]}>{comment.author.name}</Text>

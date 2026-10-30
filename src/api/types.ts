@@ -38,6 +38,13 @@ export type RegisterInput = {
   password_confirmation: string;
 };
 
+/** Arquivo escolhido no celular para enviar (multipart). */
+export type UploadFile = {
+  uri: string;
+  name: string; // ex.: "avatar.jpg"
+  type: string; // ex.: "image/jpeg"
+};
+
 export type ChangePasswordInput = {
   current_password: string;
   password: string;
@@ -153,3 +160,5 @@ export type Paginated<T> = {
   data: T[];
   meta: { current_page: number; last_page: number; per_page: number; total: number };
 };
+
+export type UpdateMeInput = { name: string }; // só o nome: a data de nascimento não muda (D09)

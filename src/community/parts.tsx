@@ -27,12 +27,12 @@ export function Avatar({ author, size = 44 }: { author: Pick<Author, 'name' | 't
 }
 
 /** Faixa "Prévia": a Comunidade é só visual, para ninguém achar que publicou de verdade. */
-export function PreviewBanner() {
+export function PreviewBanner({ text }: { text?: string }) {
   const c = useColors();
   const { t } = useTranslation();
   return (
     <View style={[styles.banner, { backgroundColor: c.surface }, contrastOutline(c)]}>
-      <Text style={[styles.bannerText, { color: c.link }]}>{t('app_community_preview')}</Text>
+      <Text style={[styles.bannerText, { color: c.link }]}>{text ?? t('app_community_preview')}</Text>
     </View>
   );
 }

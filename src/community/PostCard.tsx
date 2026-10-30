@@ -8,6 +8,7 @@ import { postStore, type Post } from '@/showcase/community';
 import { useColors } from '@/theme/useColors';
 import { formatAgo } from '@/utils/format';
 import { Avatar, OwnerBadge } from './parts';
+import { useOpenProfile } from './useOpenProfile';
 
 export function toggleLike(postId: number) {
   postStore.set(0, (list) =>
@@ -27,6 +28,7 @@ export function PostCard({ post, onPress, large }: Props) {
   const c = useColors();
   const { t } = useTranslation();
   const time = formatAgo(post.at);
+  const openProfile = useOpenProfile();
 
   const label = [
     `${post.author.name}, @${post.author.handle}, ${time}`,
@@ -46,11 +48,24 @@ export function PostCard({ post, onPress, large }: Props) {
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={label}
       accessibilityHint={onPress ? t('app_community_open_post') : undefined}
-      accessibilityActions={[{ name: 'like', label: post.liked ? t('app_community_liked') : t('app_community_like') }]}
-      onAccessibilityAction={(e) => e.nativeEvent.actionName === 'like' && toggleLike(post.id)}
+      accessibilityActions={[
+        { name: 'like', label: post.liked ? t('app_community_liked') : t('app_community_like') },
+        { name: 'profile', label: t('app_a11y_open_profile', { name: post.author.name }) },
+      ]}
+      onAccessibilityAction={(e) => {
+        if (e.nativeEvent.actionName === 'like') toggleLike(post.id);
+        if (e.nativeEvent.actionName === 'profile') openProfile(post.author.handle);
+      }}
       onPress={onPress}
       style={({ pressed }) => [styles.post, { borderBottomColor: c.divider, opacity: pressed ? 0.85 : 1 }]}>
-      <Avatar author={post.author} />
+      {/* Foto -> perfil de quem postou; o resto do post -> o post com os comentários. */}
+      <Pressable
+        accessible={false}
+        importantForAccessibility="no-hide-descendants"
+        hitSlop={6}
+        onPress={() => openProfile(post.author.handle)}>
+        <Avatar author={post.author} />
+      </Pressable>
       <View style={styles.body}>
         <Text style={styles.header}>
           <Text style={[styles.name, { color: c.text }]}>{post.author.name}</Text>

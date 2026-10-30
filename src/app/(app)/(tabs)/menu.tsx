@@ -1,5 +1,4 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -8,11 +7,11 @@ import { useAuth } from '@/auth/AuthProvider';
 import { Screen } from '@/components/Screen';
 import { SettingsGroup, SettingsRow } from '@/components/SettingsList';
 import { Text } from '@/components/Text';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useFavorites } from '@/favorites/FavoritesProvider';
 import { contrastOutline } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
-import { initials } from '@/utils/format';
 
 // Aba "Menu" (☰): o que a pessoa usa menos que buscar, ver o mapa e a comunidade.
 // A barra fica só com as abas principais; perfil, favoritos e configurações moram aqui.
@@ -37,13 +36,7 @@ export default function MenuScreen() {
           { backgroundColor: c.surface, opacity: pressed ? 0.6 : 1 },
           contrastOutline(c),
         ]}>
-        <View style={[styles.avatar, { backgroundColor: c.primary }]}>
-          {user?.avatar_url ? (
-            <Image source={user.avatar_url} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
-          ) : (
-            <Text style={[styles.avatarText, { color: c.onPrimary }]}>{initials(user?.name ?? '')}</Text>
-          )}
-        </View>
+        <UserAvatar user={user} size={56} />
         <View style={styles.flex}>
           <Text style={[styles.name, { color: c.text }]} numberOfLines={1}>
             {user?.name}
@@ -94,7 +87,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   title: { fontSize: 28, fontFamily: fonts.medium, paddingHorizontal: 4 },
   profile: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: 22, padding: 16 },
-  avatar: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  avatarText: { fontSize: 20, fontWeight: '700' },
   name: { fontSize: 18, fontWeight: '700' },
 });

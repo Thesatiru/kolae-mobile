@@ -8,6 +8,7 @@ export type Author = {
   handle: string;
   owner?: boolean; // responsável pela quadra: ganha o selo
   tone: 'primary' | 'strong'; // cor do círculo das iniciais
+  bio?: string; // linha embaixo do @ no perfil
 };
 
 export type Post = {
@@ -29,13 +30,42 @@ export type Comment = { id: string; author: Author; text: string; at: string; li
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
 const img = (seed: string) => `https://picsum.photos/seed/${seed}/800/600`;
 
-const lucas: Author = { name: 'Lucas Andrade', handle: 'lucasandrade', tone: 'primary' };
-const bia: Author = { name: 'Bia Santos', handle: 'biasantos', tone: 'strong' };
-const xuxa: Author = { name: 'Quadra do Xuxa', handle: 'quadradoxuxa', owner: true, tone: 'strong' };
+const lucas: Author = { name: 'Lucas Andrade', handle: 'lucasandrade', tone: 'primary', bio: 'Futebol society às quintas · Suzano' };
+const bia: Author = {
+  name: 'Bia Santos',
+  handle: 'biasantos',
+  tone: 'strong',
+  bio: 'Vôlei de areia e futevôlei · Ferraz de Vasconcelos',
+};
+const xuxa: Author = {
+  name: 'Quadra do Xuxa',
+  handle: 'quadradoxuxa',
+  owner: true,
+  tone: 'strong',
+  bio: 'Society com grama sintética · Suzano',
+};
 const marcos: Author = { name: 'Marcos Antonio', handle: 'marcosantonio', tone: 'strong' };
 const joao: Author = { name: 'João Pedro', handle: 'joaopedro', tone: 'primary' };
 const duda: Author = { name: 'Duda Lima', handle: 'dudalima', tone: 'primary' };
 const gabi: Author = { name: 'Gabi Rocha', handle: 'gabirocha', tone: 'strong' };
+
+const AUTHORS = [lucas, bia, xuxa, marcos, joao, duda, gabi];
+
+/** Pessoa de exemplo pelo @ (perfil de outra pessoa). */
+export const findAuthor = (handle: string) => AUTHORS.find((a) => a.handle === handle);
+
+/** "Rafael Lana" -> "rafaellana": o @ da própria pessoa na vitrine (a API não tem @). */
+export function handleFor(name: string) {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+// Quem a pessoa segue (@s) e a capa do próprio perfil: só na memória, como o resto da vitrine.
+export const followStore = createShowcaseStore<string[]>(() => []);
+export const coverStore = createShowcaseStore<string | null>(() => null);
 
 export const showcaseVenues = ['Arena Suzano', 'Quadra do Xuxa', 'Quadra FATEC Ferraz', 'Arena Ferraz', 'SESI - Suzano'];
 
