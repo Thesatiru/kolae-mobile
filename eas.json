@@ -10,9 +10,9 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_MOCK_AUTH": "true",
-        "EXPO_PUBLIC_MOCK_VENUES": "true",
-        "EXPO_PUBLIC_API_URL": "http://192.168.0.10/kolae/api/v1"
+        "EXPO_PUBLIC_MOCK_AUTH": "false",
+        "EXPO_PUBLIC_MOCK_VENUES": "false",
+        "EXPO_PUBLIC_API_URL": "https://kolae.online/api/v1"
       }
     }
   }
