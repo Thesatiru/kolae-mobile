@@ -1,11 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { listSports, listVenues } from '@/api/venues';
 import type { Sport, VenueFilters } from '@/api/types';
+import { usePullToRefresh } from '@/components/PullToRefresh';
 import { QueryState } from '@/components/QueryState';
 import { RainbowStripe } from '@/components/Rainbow';
 import { Screen } from '@/components/Screen';
@@ -88,6 +89,11 @@ export default function HomeScreen() {
   const q = useDebounced(search.trim()) || undefined;
 
   const sports = useQuery({ queryKey: ['sports'], queryFn: listSports });
+  // Cada seção tem a sua consulta: o puxão refaz as que estão na tela (esportes e quadras).
+  const queryClient = useQueryClient();
+  const refreshControl = usePullToRefresh(() =>
+    Promise.all([sports.refetch(), queryClient.refetchQueries({ queryKey: ['venues'], type: 'active' })]),
+  );
   // "Perto de você" precisa da posição (sort=distance sem lat/lng é 422); sem ela, lista todas.
   const { position, ready } = useUserPosition();
   const near: VenueFilters = position
@@ -95,7 +101,7 @@ export default function HomeScreen() {
     : { q, sport_id: sportId };
 
   return (
-    <Screen contentStyle={styles.content}>
+    <Screen contentStyle={styles.content} refreshControl={refreshControl}>
       <View style={[styles.search, { backgroundColor: c.surface }, contrastOutline(c)]}>
         <TextInput
           accessibilityLabel={t('app_search_ph')}

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import type { Schedule, ScheduleSlot, VenueDetail } from '@/api/types';
 import { getSchedule, getVenue } from '@/api/venues';
 import { Button } from '@/components/Button';
+import { usePullToRefresh } from '@/components/PullToRefresh';
 import { QueryState } from '@/components/QueryState';
 import { StatusBanner } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
@@ -92,6 +93,8 @@ export default function ScheduleScreen() {
     enabled: selected !== todayKey, // hoje já vem da consulta de cima
   });
   const schedule = selected === todayKey ? todayQuery : dayQuery;
+  // Puxar atualiza o status da quadra e a agenda do dia escolhido.
+  const refreshControl = usePullToRefresh(() => Promise.all([venueQuery.refetch(), schedule.refetch()]));
 
   // Ao voltar para a tela, atualiza status e agenda (a primeira vez já é a busca inicial).
   const focusedOnce = useRef(false);
@@ -123,6 +126,7 @@ export default function ScheduleScreen() {
       <ScrollView
         style={[styles.sheet, { marginTop: imageHeight - 24, backgroundColor: c.background }]}
         contentContainerStyle={[styles.sheetContent, { paddingBottom: 120 + insets.bottom }]}
+        refreshControl={refreshControl}
         showsVerticalScrollIndicator={false}>
         <QueryState
           loading={venueQuery.isPending}

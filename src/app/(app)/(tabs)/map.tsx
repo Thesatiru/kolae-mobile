@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { AccessibilityInfo, ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import MapView, { type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -97,6 +97,16 @@ export default function MapScreen() {
       focusedOnce.current = true;
     }, [refetchVenues]),
   );
+
+  // Botão de atualizar: refaz a busca com os filtros atuais; a roda só gira no toque.
+  const [refreshing, setRefreshing] = useState(false);
+  async function refreshVenues() {
+    setRefreshing(true);
+    const result = await refetchVenues();
+    setRefreshing(false);
+    // O mapa não muda de um jeito que o leitor de tela perceba: avisa que deu certo.
+    if (!result.error) AccessibilityInfo.announceForAccessibility(t('app_map_refreshed'));
+  }
 
   // Quadra sem coordenadas aparece na lista, mas não no mapa.
   const pins = useMemo(() => (venues.data?.data ?? []).filter(hasCoordinates), [venues.data]);
@@ -262,13 +272,28 @@ export default function MapScreen() {
               </View>
             ))}
           </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('app_locate_me')}
-            onPress={goToMe}
-            style={[styles.round, styles.shadow, { backgroundColor: c.background }, hcBorder]}>
-            <MaterialCommunityIcons name="crosshairs-gps" size={24} color={c.text} />
-          </Pressable>
+          <View style={styles.roundColumn} pointerEvents="box-none">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('app_map_refresh')}
+              accessibilityState={{ busy: refreshing, disabled: refreshing }}
+              disabled={refreshing}
+              onPress={refreshVenues}
+              style={[styles.round, styles.shadow, { backgroundColor: c.background }, hcBorder]}>
+              {refreshing ? (
+                <ActivityIndicator color={c.primary} />
+              ) : (
+                <MaterialCommunityIcons name="refresh" size={24} color={c.text} />
+              )}
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('app_locate_me')}
+              onPress={goToMe}
+              style={[styles.round, styles.shadow, { backgroundColor: c.background }, hcBorder]}>
+              <MaterialCommunityIcons name="crosshairs-gps" size={24} color={c.text} />
+            </Pressable>
+          </View>
         </View>
         {selected ? <MapVenueCard venue={selected} /> : null}
       </View>
@@ -318,6 +343,7 @@ const styles = StyleSheet.create({
   notice: { alignSelf: 'center', borderRadius: 18, paddingHorizontal: 16, paddingVertical: 10, marginHorizontal: 16 },
   bottom: { position: 'absolute', left: 16, right: 16, bottom: 16, gap: 12 },
   bottomRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
+  roundColumn: { gap: 12 },
   legend: { borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10, gap: 6 },
   legendRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   shadow: {

@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import type { OpeningHours } from '@/api/types';
 import { getVenue } from '@/api/venues';
 import { Button } from '@/components/Button';
+import { usePullToRefresh } from '@/components/PullToRefresh';
 import { QueryState } from '@/components/QueryState';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
@@ -97,6 +98,7 @@ export default function VenueScreen() {
   const venueId = Number(id);
   const query = useQuery({ queryKey: ['venue', venueId], queryFn: () => getVenue(venueId) });
   const venue = query.data;
+  const refreshControl = usePullToRefresh(query.refetch);
   const { position } = useUserPosition();
   // Avaliações são vitrine (D04): nota e total vêm das de exemplo.
   const reviews = summarizeReviews(reviewStore.useValue(venueId));
@@ -131,6 +133,7 @@ export default function VenueScreen() {
       <ScrollView
         style={[styles.sheet, { marginTop: imageHeight - 24, backgroundColor: c.background }]}
         contentContainerStyle={[styles.sheetContent, { paddingBottom: 120 + insets.bottom }]}
+        refreshControl={refreshControl}
         showsVerticalScrollIndicator={false}>
         <QueryState
           loading={query.isPending}

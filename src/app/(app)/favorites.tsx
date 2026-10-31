@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { listVenues } from '@/api/venues';
 import { PageHeader } from '@/components/PageHeader';
+import { usePullToRefresh } from '@/components/PullToRefresh';
 import { QueryState } from '@/components/QueryState';
 import { Screen } from '@/components/Screen';
 import { VenueCard } from '@/components/VenueCard';
@@ -14,9 +15,10 @@ export default function FavoritesScreen() {
   const { ids } = useFavorites();
   const query = useQuery({ queryKey: ['venues', { per_page: 100 }], queryFn: () => listVenues({ per_page: 100 }) });
   const favorites = (query.data?.data ?? []).filter((v) => ids.has(v.id));
+  const refreshControl = usePullToRefresh(query.refetch);
 
   return (
-    <Screen contentStyle={styles.content}>
+    <Screen contentStyle={styles.content} refreshControl={refreshControl}>
       <PageHeader title={t('app_tab_favorites')} />
       <QueryState
         loading={query.isPending}

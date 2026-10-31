@@ -3,6 +3,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  type RefreshControlProps,
   View,
   type StyleProp,
   type ViewStyle,
@@ -19,6 +20,7 @@ type Props = {
   edges?: Edge[];
   backgroundColor?: string;
   contentStyle?: StyleProp<ViewStyle>;
+  refreshControl?: React.ReactElement<RefreshControlProps>; // usePullToRefresh()
 };
 
 const DEFAULT_PADDING = 24;
@@ -27,7 +29,7 @@ const BANNER_SPACE = 28; // altura do aviso de modo de teste + respiro
 // Tela com rolagem em que o teclado não cobre os campos.
 // Sem 'bottom' em edges, o fim da rolagem ainda reserva o espaço da barra de navegação do
 // Android/iPhone (e do aviso de modo de teste), para o último item não ficar por baixo dela.
-export function Screen({ children, edges = ['top'], backgroundColor, contentStyle }: Props) {
+export function Screen({ children, edges = ['top'], backgroundColor, contentStyle, refreshControl }: Props) {
   const c = useColors();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -41,6 +43,7 @@ export function Screen({ children, edges = ['top'], backgroundColor, contentStyl
         <ScrollView
           contentContainerStyle={[styles.content, contentStyle, { paddingBottom }]}
           keyboardShouldPersistTaps="handled"
+          refreshControl={refreshControl}
           showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>

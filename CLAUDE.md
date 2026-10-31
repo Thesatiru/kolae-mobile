@@ -49,7 +49,8 @@ quadra, avaliações, favoritos (D04) e a **Comunidade** (rede social do esporte
 você/Amigos, novo post e comentários; posts aceitam texto e foto, nunca links; respostas só
 texto). No perfil, capa, seguidores, vitórias, posts e fotos também são vitrine e saem da
 Comunidade (sem posts, o perfil fica vazio). Dados em `src/showcase/` (a Comunidade em
-`src/showcase/community.ts`), em memória.
+`src/showcase/community.ts`), em memória. Exceção: os favoritos ficam salvos no aparelho, por
+usuário (AsyncStorage, `src/favorites/`), e também não vão para a API.
 
 ## Como o app consome a API
 

@@ -1,4 +1,5 @@
 import '@/i18n';
+import '@/network/online';
 
 import { AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold } from '@expo-google-fonts/atkinson-hyperlegible';
 import { Kanit_400Regular, Kanit_500Medium, Kanit_700Bold, useFonts } from '@expo-google-fonts/kanit';
@@ -12,6 +13,7 @@ import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { BrandSplash } from '@/components/BrandSplash';
 import { ToastProvider } from '@/components/Toast';
 import { FavoritesProvider } from '@/favorites/FavoritesProvider';
+import { OfflineBanner } from '@/network/OfflineBanner';
 import { PreferencesProvider, usePreferences } from '@/preferences/PreferencesProvider';
 import { useColors } from '@/theme/useColors';
 
@@ -21,7 +23,8 @@ SplashScreen.preventAutoHideAsync();
 const SPLASH_MIN_MS = 1200; // tempo mínimo da marca na tela, sem travar o app à toa
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, staleTime: 60_000 } },
+  // Ao reconectar, recarrega as telas abertas mesmo que os dados ainda não estejam "velhos".
+  defaultOptions: { queries: { retry: 1, staleTime: 60_000, refetchOnReconnect: 'always' } },
 });
 
 function RootNavigator({ fontsLoaded }: { fontsLoaded: boolean }) {
@@ -47,6 +50,7 @@ function RootNavigator({ fontsLoaded }: { fontsLoaded: boolean }) {
       <StatusBar style={c.scheme === 'dark' ? 'light' : 'dark'} />
       <ToastProvider>
         <Slot />
+        <OfflineBanner />
       </ToastProvider>
     </ThemeProvider>
   );
