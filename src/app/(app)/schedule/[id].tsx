@@ -130,6 +130,7 @@ export default function ScheduleScreen() {
           empty={!venue}
           emptyText=""
           onRetry={venueQuery.refetch}
+          errorVariant="screen"
           minHeight={240}>
           {venue ? (
             <>

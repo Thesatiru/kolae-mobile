@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 
 import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { BrandSplash } from '@/components/BrandSplash';
+import { ToastProvider } from '@/components/Toast';
 import { FavoritesProvider } from '@/favorites/FavoritesProvider';
 import { PreferencesProvider, usePreferences } from '@/preferences/PreferencesProvider';
 import { useColors } from '@/theme/useColors';
@@ -44,7 +45,9 @@ function RootNavigator({ fontsLoaded }: { fontsLoaded: boolean }) {
   return (
     <ThemeProvider value={c.scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar style={c.scheme === 'dark' ? 'light' : 'dark'} />
-      <Slot />
+      <ToastProvider>
+        <Slot />
+      </ToastProvider>
     </ThemeProvider>
   );
 }

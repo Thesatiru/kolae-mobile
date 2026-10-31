@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { toApiError } from '@/api/errors';
 import { useAuth } from '@/auth/AuthProvider';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
@@ -16,6 +15,7 @@ import { TextField } from '@/components/TextField';
 import { linkDecoration } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
+import { errorMessage } from '@/utils/errorMessage';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
@@ -37,7 +37,7 @@ export default function LoginScreen() {
       await signIn({ email: email.trim(), password }, remember);
       // O layout (auth) redireciona sozinho quando o usuário existe.
     } catch (err) {
-      setError(toApiError(err).message);
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }

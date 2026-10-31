@@ -6,7 +6,6 @@ import { Linking, Platform, StyleSheet, View } from 'react-native';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { forgotPassword } from '@/api/auth';
-import { toApiError } from '@/api/errors';
 import { Button } from '@/components/Button';
 import { CurvedHeader } from '@/components/CurvedHeader';
 import { Logo } from '@/components/Logo';
@@ -16,6 +15,7 @@ import { TextField } from '@/components/TextField';
 import { statusColors } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
+import { errorMessage } from '@/utils/errorMessage';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RESEND_SECONDS = 45;
@@ -47,7 +47,7 @@ export default function ForgotPasswordScreen() {
       setSent(true);
       setCooldown(RESEND_SECONDS);
     } catch (err) {
-      setError(toApiError(err).message);
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }

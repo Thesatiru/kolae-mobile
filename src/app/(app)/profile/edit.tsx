@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { AccessibilityInfo, ActivityIndicator, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { updateMe } from '@/api/auth';
@@ -15,6 +15,7 @@ import { Screen } from '@/components/Screen';
 import { SettingsGroup, SettingsRow } from '@/components/SettingsList';
 import { Text } from '@/components/Text';
 import { TextField } from '@/components/TextField';
+import { useToast } from '@/components/Toast';
 import { UserAvatar } from '@/components/UserAvatar';
 import i18n from '@/i18n';
 import { CoverPattern } from '@/profile/CoverPattern';
@@ -22,6 +23,7 @@ import { useChangeAvatar } from '@/profile/useChangeAvatar';
 import { coverStore } from '@/showcase/community';
 import { linkDecoration } from '@/theme/colors';
 import { useColors } from '@/theme/useColors';
+import { errorMessage } from '@/utils/errorMessage';
 
 const COVER_HEIGHT = 140;
 const AVATAR = 104;
@@ -39,6 +41,7 @@ export default function EditProfileScreen() {
   const c = useColors();
   const { t } = useTranslation();
   const { user, updateUser } = useAuth();
+  const { showToast } = useToast();
   const { change, uploading } = useChangeAvatar();
   const { width } = useWindowDimensions();
   const cover = coverStore.useValue(0);
@@ -63,11 +66,11 @@ export default function EditProfileScreen() {
     setSaving(true);
     try {
       updateUser(await updateMe({ name: name.trim() }));
-      AccessibilityInfo.announceForAccessibility(t('app_profile_saved'));
+      showToast(t('app_profile_saved'), t('app_toast_profile_text'));
       router.back();
     } catch (err) {
       const apiError = toApiError(err);
-      setError(apiError.field('name') ?? apiError.message);
+      setError(apiError.field('name') ?? errorMessage(err));
     } finally {
       setSaving(false);
     }

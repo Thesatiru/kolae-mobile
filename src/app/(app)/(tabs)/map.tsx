@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { VenueFilters, VenueStatus, VenueSummary } from '@/api/types';
 import { listSports, listVenues } from '@/api/venues';
+import { errorKind } from '@/components/ErrorState';
 import { StatusDot } from '@/components/StatusBadge';
 import { Text, useInputFont } from '@/components/Text';
 import { useEnableLocation, useUserPosition } from '@/location/useUserPosition';
@@ -231,8 +232,10 @@ export default function MapScreen() {
             accessibilityRole="button"
             onPress={() => venues.refetch()}
             style={[styles.notice, styles.shadow, { backgroundColor: c.background }]}>
-            <Text accessibilityLiveRegion="polite" style={{ color: c.text }}>
-              {t('app_load_error')} <Text style={{ color: c.link, fontWeight: '700' }}>{t('app_retry')}</Text>
+            {/* Sobre o mapa cabe só um aviso curto; a tela de erro completa fica para as outras telas. */}
+            <Text accessibilityLiveRegion="polite" style={{ color: c.text, textAlign: 'center' }}>
+              {t(errorKind(venues.error) === 'offline' ? 'app_offline_title' : 'app_error_title')}{' '}
+              <Text style={{ color: c.link, fontWeight: '700' }}>{t('app_retry')}</Text>
             </Text>
           </Pressable>
         ) : !pins.length ? (

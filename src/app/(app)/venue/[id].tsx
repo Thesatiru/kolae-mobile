@@ -138,6 +138,7 @@ export default function VenueScreen() {
           empty={!venue}
           emptyText=""
           onRetry={query.refetch}
+          errorVariant="screen"
           minHeight={240}>
           {venue ? (
             <>

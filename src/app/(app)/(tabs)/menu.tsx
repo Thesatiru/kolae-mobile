@@ -50,6 +50,12 @@ export default function MenuScreen() {
 
       <SettingsGroup>
         <SettingsRow
+          icon="crown-outline"
+          label={t('app_plans_title')}
+          description={t('app_plans_menu_desc')}
+          onPress={() => router.push('/plans')}
+        />
+        <SettingsRow
           icon="heart-outline"
           label={t('app_tab_favorites')}
           description={t('app_menu_favorites_desc')}

@@ -1,11 +1,13 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { AccessibilityInfo, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { uploadAvatar } from '@/api/auth';
 import { toApiError } from '@/api/errors';
 import { useAuth } from '@/auth/AuthProvider';
+import { useToast } from '@/components/Toast';
+import { errorMessage } from '@/utils/errorMessage';
 
 const MAX_BYTES = 10 * 1024 * 1024; // contrato: até 10 MB
 const TYPES: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif' };
@@ -17,6 +19,7 @@ const TYPES: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', p
 export function useChangeAvatar() {
   const { t } = useTranslation();
   const { updateUser } = useAuth();
+  const { showToast } = useToast();
   const [uploading, setUploading] = useState(false);
 
   async function change() {
@@ -42,10 +45,10 @@ export function useChangeAvatar() {
     try {
       const user = await uploadAvatar({ uri: asset.uri, name: asset.fileName ?? `avatar.${ext}`, type });
       updateUser(user);
-      AccessibilityInfo.announceForAccessibility(t('app_photo_updated'));
+      showToast(t('app_photo_updated'), t('app_toast_photo_text'));
     } catch (err) {
       const apiError = toApiError(err);
-      const message = apiError.code === 'FILE_TOO_LARGE' ? t('app_photo_too_big') : (apiError.field('avatar') ?? apiError.message);
+      const message = apiError.code === 'FILE_TOO_LARGE' ? t('app_photo_too_big') : (apiError.field('avatar') ?? errorMessage(err));
       Alert.alert(t('app_photo_error_title'), message);
     } finally {
       setUploading(false);

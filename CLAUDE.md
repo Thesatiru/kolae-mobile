@@ -182,7 +182,9 @@ tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 - Telas nunca chamam axios direto: sempre uma função de `src/api/`.
 - Toda função de `src/api/` tem versão mock, e o mock segue **exatamente** o contrato
   (`code`, `errors` como lista, status HTTP).
-- Erros sempre por `toApiError(err)`.
+- Erros sempre por `toApiError(err)`. Tela sem dados por erro: `<ErrorState>` (ou o `<QueryState>`,
+  que já usa), com o K, "Algo deu errado..." e o caminho do suporte (`utils/support.ts`).
+  Mensagem em formulário ou alerta: `errorMessage(err)` (sem internet e erro 500 já traduzidos).
 - Textos visíveis sempre via `t()`, nos 7 idiomas.
 - Cores sempre de `useColors()`, nunca hex solto nas telas.
 - Telas com formulário usam `<Screen>`.
@@ -197,8 +199,7 @@ Em ordem de prioridade. Apague o item quando terminar.
 
 1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
    testar pelo 4G.
-2. **Estados de erro, vazio e sem conexão** em todas as telas que usam a API (S5).
-3. Revisar as vitrines com o aviso "Prévia" (S5).
+2. Revisar as vitrines com o aviso "Prévia" (S5).
 
 ## Cronograma (igual ao docs/README.md do João)
 

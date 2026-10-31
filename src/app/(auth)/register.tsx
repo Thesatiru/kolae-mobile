@@ -18,6 +18,7 @@ import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
 import { brDateToIso, maskDate } from '@/utils/date';
 import { openLegal, PRIVACY_URL, TERMS_URL } from '@/utils/legal';
+import { errorMessage } from '@/utils/errorMessage';
 
 type Field = 'name' | 'email' | 'birthdate' | 'password' | 'password_confirmation';
 type Errors = Partial<Record<Field, string>>;
@@ -84,7 +85,7 @@ export default function RegisterScreen() {
         if (msg) fields[f] = msg;
       });
       setErrors(fields);
-      if (!Object.keys(fields).length) setFormError(apiError.message);
+      if (!Object.keys(fields).length) setFormError(errorMessage(err));
     } finally {
       setLoading(false);
     }

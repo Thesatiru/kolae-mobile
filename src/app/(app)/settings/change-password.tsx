@@ -13,7 +13,9 @@ import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { TextField } from '@/components/TextField';
+import { useToast } from '@/components/Toast';
 import { useColors } from '@/theme/useColors';
+import { errorMessage } from '@/utils/errorMessage';
 
 function Rule({ ok, label }: { ok: boolean; label: string }) {
   const c = useColors();
@@ -34,6 +36,7 @@ export default function ChangePasswordScreen() {
   const { t } = useTranslation();
   const c = useColors();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [current, setCurrent] = useState('');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
@@ -53,7 +56,7 @@ export default function ChangePasswordScreen() {
     setLoading(true);
     try {
       await changePassword({ current_password: current, password, password_confirmation: confirmation });
-      Alert.alert(t('app_password_changed'));
+      showToast(t('app_toast_password_title'), t('app_toast_password_text'));
       router.back();
     } catch (err) {
       const apiError = toApiError(err);
@@ -62,7 +65,7 @@ export default function ChangePasswordScreen() {
       setErrors({
         current: currentError,
         password: passwordError,
-        form: currentError || passwordError ? undefined : apiError.message,
+        form: currentError || passwordError ? undefined : errorMessage(err),
       });
     } finally {
       setLoading(false);
@@ -76,7 +79,7 @@ export default function ChangePasswordScreen() {
       await forgotPassword(user.email);
       Alert.alert(t('app_forgot_sent_title'), t('app_forgot_sent_plain', { email: user.email }));
     } catch (err) {
-      Alert.alert(toApiError(err).message);
+      Alert.alert(errorMessage(err));
     }
   }
 
