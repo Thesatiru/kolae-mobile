@@ -7,7 +7,7 @@ import MapView, { type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import type { VenueFilters, VenueStatus, VenueSummary } from '@/api/types';
+import type { VenueFilters, VenueStatus } from '@/api/types';
 import { listSports, listVenues } from '@/api/venues';
 import { errorKind } from '@/components/ErrorState';
 import { StatusDot } from '@/components/StatusBadge';
@@ -20,6 +20,7 @@ import { countFilters, MapFiltersSheet, PRICE_CHIP_CENTS, type MapFilters } from
 import { MapVenueCard } from '@/map/MapVenueCard';
 import { usePreferences } from '@/preferences/PreferencesProvider';
 import { useColors } from '@/theme/useColors';
+import { msUntilNextChange } from '@/utils/date';
 import { formatPrice } from '@/utils/format';
 import { hasCoordinates } from '@/utils/geo';
 
@@ -27,15 +28,6 @@ import { hasCoordinates } from '@/utils/geo';
 const DEFAULT_REGION: Region = { latitude: -23.54, longitude: -46.34, latitudeDelta: 0.2, longitudeDelta: 0.2 };
 const NEAR_DELTA = 0.05;
 const LEGEND: VenueStatus[] = ['available', 'in_use', 'closed'];
-
-// Busca de novo quando algum status vence (D03: o status muda com o relógio), entre 30 s e 10 min.
-function msUntilNextChange(venues: VenueSummary[] | undefined) {
-  const next = Math.min(
-    ...(venues ?? []).map((v) => (v.status_until ? new Date(v.status_until).getTime() : Infinity)),
-  );
-  const ms = Number.isFinite(next) ? next - Date.now() + 1000 : 10 * 60_000;
-  return Math.min(Math.max(ms, 30_000), 10 * 60_000);
-}
 
 function useDebounced<T>(value: T, ms = 350) {
   const [debounced, setDebounced] = useState(value);

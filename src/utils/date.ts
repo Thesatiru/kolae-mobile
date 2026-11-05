@@ -37,3 +37,9 @@ export function msUntilChange(iso: string | null | undefined): number {
   const ms = iso ? new Date(iso).getTime() - Date.now() + 1000 : 10 * 60_000;
   return Math.min(Math.max(ms, 30_000), 10 * 60_000);
 }
+
+/** Igual ao msUntilChange, para uma lista: espera até a primeira quadra que muda de status. */
+export function msUntilNextChange(venues: { status_until: string | null }[] | undefined): number {
+  const next = Math.min(...(venues ?? []).map((v) => (v.status_until ? new Date(v.status_until).getTime() : Infinity)));
+  return msUntilChange(Number.isFinite(next) ? new Date(next).toISOString() : null);
+}

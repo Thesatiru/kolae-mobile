@@ -14,6 +14,7 @@ import { Text, useInputFont } from '@/components/Text';
 import { VenueCard } from '@/components/VenueCard';
 import { useUserPosition } from '@/location/useUserPosition';
 import { contrastOutline } from '@/theme/colors';
+import { msUntilNextChange } from '@/utils/date';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
 import { sportIcon } from '@/utils/sportIcons';
@@ -31,7 +32,13 @@ function useDebounced<T>(value: T, ms = 350) {
 function VenueSection({ title, filters, enabled = true }: { title: string; filters: VenueFilters; enabled?: boolean }) {
   const c = useColors();
   const { t } = useTranslation();
-  const query = useQuery({ queryKey: ['venues', filters], queryFn: () => listVenues(filters), enabled });
+  // O card mostra o status: busca de novo quando algum vence (D03: o status muda com o relógio).
+  const query = useQuery({
+    queryKey: ['venues', filters],
+    queryFn: () => listVenues(filters),
+    enabled,
+    refetchInterval: (q) => msUntilNextChange(q.state.data?.data),
+  });
   const venues = query.data?.data ?? [];
 
   return (
