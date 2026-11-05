@@ -24,6 +24,7 @@ import { Text } from '@/components/Text';
 import { VenueHero } from '@/components/VenueHero';
 import { VenueSocials } from '@/components/VenueSocials';
 import { useUserPosition } from '@/location/useUserPosition';
+import { VenueMiniMap } from '@/map/VenueMiniMap';
 import { useRecentlyViewed } from '@/search/useRecentSearches';
 import { reviewStore, summarizeReviews } from '@/showcase/reviews';
 import { contrastOutline } from '@/theme/colors';
@@ -306,15 +307,7 @@ export default function VenueScreen() {
               <View style={[styles.hDivider, { backgroundColor: c.divider }]} />
 
               <Text accessibilityRole="header" style={[styles.sectionTitle, styles.noTopMargin, { color: c.text }]}>{t('app_location')}</Text>
-              {/* Mapa de verdade entra com o react-native-maps (S3); por ora, só o atalho. */}
-              {/* O quadro repete o link de baixo: fica fora do leitor de tela para não ler duas vezes. */}
-              <Pressable
-                accessible={false}
-                importantForAccessibility="no-hide-descendants"
-                onPress={() => Linking.openURL(mapsUrl(venue))}
-                style={[styles.mapBox, { backgroundColor: c.surface }, contrastOutline(c)]}>
-                <MaterialCommunityIcons name="map-marker" size={44} color={c.primary} />
-              </Pressable>
+              <VenueMiniMap venue={venue} />
               <Pressable
                 accessibilityRole="link"
                 accessibilityLabel={t('app_open_maps')}
@@ -395,7 +388,6 @@ const styles = StyleSheet.create({
   hoursRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   hoursDay: { fontSize: 14 },
   chatButton: { borderWidth: 1.5, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10 },
-  mapBox: { height: 170, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   price: { fontSize: 20, fontWeight: '800' },
   perHour: { fontSize: 14, fontWeight: '400' },
   bottomBar: {
