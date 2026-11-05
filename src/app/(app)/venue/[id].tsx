@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Linking,
   Pressable,
@@ -23,6 +23,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
 import { VenueHero } from '@/components/VenueHero';
 import { useUserPosition } from '@/location/useUserPosition';
+import { useRecentlyViewed } from '@/search/useRecentSearches';
 import { reviewStore, summarizeReviews } from '@/showcase/reviews';
 import { contrastOutline } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
@@ -98,6 +99,12 @@ export default function VenueScreen() {
   const venueId = Number(id);
   const query = useQuery({ queryKey: ['venue', venueId], queryFn: () => getVenue(venueId) });
   const venue = query.data;
+  // Entra em "Vistas recentemente" da Pesquisar quando a quadra carrega de verdade.
+  const { add: addViewed } = useRecentlyViewed();
+  const loadedId = venue?.id;
+  useEffect(() => {
+    if (loadedId !== undefined) addViewed(loadedId);
+  }, [loadedId, addViewed]);
   const refreshControl = usePullToRefresh(query.refetch);
   const { position } = useUserPosition();
   // Avaliações são vitrine (D04): nota e total vêm das de exemplo.
