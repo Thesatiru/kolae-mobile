@@ -212,6 +212,8 @@
   "app_a11y_met": "クリア",
   "app_a11y_not_met": "未達成",
   "app_reduce_motion_desc": "端末でアニメーションをオフにしている場合も自動でオンになります",
+  "app_haptics": "バイブレーション",
+  "app_haptics_desc": "フィルターやお気に入り、日付ホイールの操作時に軽く振動します",
   "app_theme_neutral": "ニュートラル",
   "app_theme_contrast": "ハイコントラスト",
   "app_color": "カラー",

@@ -212,6 +212,8 @@
   "app_a11y_met": "cumplido",
   "app_a11y_not_met": "pendiente",
   "app_reduce_motion_desc": "También se activa solo si el teléfono tiene las animaciones desactivadas",
+  "app_haptics": "Vibración",
+  "app_haptics_desc": "Toques suaves al usar filtros, guardar favoritos y girar la rueda de fecha",
   "app_theme_neutral": "Neutro",
   "app_theme_contrast": "Alto contraste",
   "app_color": "Color",

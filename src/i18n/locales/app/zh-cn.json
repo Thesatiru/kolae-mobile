@@ -212,6 +212,8 @@
   "app_a11y_met": "已满足",
   "app_a11y_not_met": "未满足",
   "app_reduce_motion_desc": "如果手机已关闭动画，也会自动开启",
+  "app_haptics": "振动",
+  "app_haptics_desc": "使用筛选、收藏和滚动日期轮时轻微振动",
   "app_theme_neutral": "中性",
   "app_theme_contrast": "高对比度",
   "app_color": "颜色",

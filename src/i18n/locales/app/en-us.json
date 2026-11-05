@@ -212,6 +212,8 @@
   "app_a11y_met": "done",
   "app_a11y_not_met": "pending",
   "app_reduce_motion_desc": "Also turns on by itself if your phone has animations removed",
+  "app_haptics": "Vibration",
+  "app_haptics_desc": "Light taps when using filters, saving favorites and spinning the date wheel",
   "app_theme_neutral": "Neutral",
   "app_theme_contrast": "High contrast",
   "app_color": "Color",
