@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -12,6 +11,7 @@ import {
 
 import { Text, useFontScale } from '@/components/Text';
 import { useColors } from '@/theme/useColors';
+import { tick } from '@/utils/haptics';
 
 type ScrollRef = React.ComponentRef<typeof ScrollView>;
 
@@ -65,7 +65,7 @@ export function WheelPicker({ items, index, onChange, label, flex = 1 }: Props) 
       const i = Math.max(0, Math.min(items.length - 1, Math.round(value / itemHeight)));
       if (i !== lastTick.current) {
         lastTick.current = i;
-        Haptics.selectionAsync().catch(() => {});
+        tick();
       }
     });
     return () => scrollY.removeListener(id);
