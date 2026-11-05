@@ -175,6 +175,12 @@ export default function AppearanceScreen() {
           switchValue={prefs.reduceMotion}
           onSwitch={prefs.setReduceMotion}
         />
+        <SettingsRow
+          label={t('app_haptics')}
+          description={t('app_haptics_desc')}
+          switchValue={prefs.haptics}
+          onSwitch={prefs.setHaptics}
+        />
       </SettingsGroup>
     </Screen>
   );

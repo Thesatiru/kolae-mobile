@@ -212,6 +212,8 @@
   "app_a11y_met": "cumprido",
   "app_a11y_not_met": "pendente",
   "app_reduce_motion_desc": "Também liga sozinho se o celular estiver com animações removidas",
+  "app_haptics": "Vibração",
+  "app_haptics_desc": "Toques leves ao usar filtros, favoritar e girar a roleta de data",
   "app_theme_neutral": "Neutro",
   "app_theme_contrast": "Alto contraste",
   "app_color": "Cor",

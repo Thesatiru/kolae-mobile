@@ -212,6 +212,8 @@
   "app_a11y_met": "पूरा",
   "app_a11y_not_met": "बाकी",
   "app_reduce_motion_desc": "अगर फ़ोन में एनिमेशन बंद हैं, तो यह अपने-आप चालू हो जाता है",
+  "app_haptics": "वाइब्रेशन",
+  "app_haptics_desc": "फ़िल्टर, पसंदीदा और तारीख़ का पहिया घुमाते समय हल्का कंपन",
   "app_theme_neutral": "न्यूट्रल",
   "app_theme_contrast": "हाई कॉन्ट्रास्ट",
   "app_color": "रंग",

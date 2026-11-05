@@ -4,6 +4,7 @@ import { AccessibilityInfo, Appearance, useColorScheme } from 'react-native';
 
 import i18n, { deviceLanguage, type Language } from '@/i18n';
 import { THEME_COLORS, type ThemeColor, type ThemeMode } from '@/theme/colors';
+import { setHapticsEnabled } from '@/utils/haptics';
 
 const KEY = 'kolae_prefs';
 
@@ -16,6 +17,7 @@ type Saved = {
   textSize: number; // índice em TEXT_SCALES
   reduceMotion: boolean;
   useLocation: boolean; // "Usar minha localização" (Configurações › Gerais)
+  haptics: boolean; // "Vibração" (Configurações › Aparência): toques leves em filtros, roleta...
 };
 
 // Pequeno, Padrão, Grande, Muito grande. Multiplica por cima do tamanho de fonte do sistema.
@@ -39,6 +41,7 @@ const DEFAULT_SAVED: Saved = {
   textSize: 1,
   reduceMotion: false,
   useLocation: true,
+  haptics: true,
 };
 
 // Versões antigas salvavam { theme: 'kolae' | 'light' | 'dark' | cor, followSystem }.
@@ -79,6 +82,7 @@ type PreferencesState = Saved & {
   setTextSize: (index: number) => void;
   setReduceMotion: (reduce: boolean) => void;
   setUseLocation: (on: boolean) => void;
+  setHaptics: (on: boolean) => void;
   showcase: Record<ShowcaseToggle, boolean>;
   setShowcase: (key: ShowcaseToggle, value: boolean) => void;
 };
@@ -126,6 +130,11 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     if (ready) i18n.changeLanguage(saved.language ?? deviceLanguage());
   }, [ready, saved.language]);
 
+  // A vibração é chamada fora de componentes (utils/haptics): avisa lá quando a opção muda.
+  useEffect(() => {
+    setHapticsEnabled(saved.haptics);
+  }, [saved.haptics]);
+
   const activeScheme =
     saved.themeMode === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : saved.themeMode;
 
@@ -141,6 +150,7 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
       setTextSize: (textSize) => update({ textSize }),
       setReduceMotion: (reduceMotion) => update({ reduceMotion }),
       setUseLocation: (useLocation) => update({ useLocation }),
+      setHaptics: (haptics) => update({ haptics }),
       fontScale: TEXT_SCALES[saved.textSize] ?? 1,
       motionReduced: saved.reduceMotion || systemReduceMotion,
       showcase,

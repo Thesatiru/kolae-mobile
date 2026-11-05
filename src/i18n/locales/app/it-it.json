@@ -212,6 +212,8 @@
   "app_a11y_met": "soddisfatto",
   "app_a11y_not_met": "da completare",
   "app_reduce_motion_desc": "Si attiva anche da solo se il telefono ha le animazioni disattivate",
+  "app_haptics": "Vibrazione",
+  "app_haptics_desc": "Tocchi leggeri quando usi i filtri, salvi i preferiti e giri la rotella della data",
   "app_theme_neutral": "Neutro",
   "app_theme_contrast": "Alto contrasto",
   "app_color": "Colore",

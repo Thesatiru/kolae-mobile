@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import type { VenueDetail } from '@/api/types';
+import { HeartIcon } from '@/components/HeartIcon';
 import { Text } from '@/components/Text';
 import { VenueCover } from '@/components/VenueCover';
 import { useFavorites } from '@/favorites/FavoritesProvider';
@@ -16,10 +17,21 @@ type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
 // Botões brancos sobre a foto: o branco fixo garante contraste em qualquer foto e tema.
 // Também usados sobre a capa do perfil.
-export function CircleButton({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
+// children: outro ícone no lugar do "icon" (ex.: o coração que pula ao favoritar).
+export function CircleButton({
+  icon,
+  label,
+  onPress,
+  children,
+}: {
+  icon?: IconName;
+  label: string;
+  onPress: () => void;
+  children?: React.ReactNode;
+}) {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={styles.circleButton}>
-      <MaterialCommunityIcons name={icon} size={22} color="#111111" />
+      {children ?? (icon ? <MaterialCommunityIcons name={icon} size={22} color="#111111" /> : null)}
     </Pressable>
   );
 }
@@ -88,11 +100,9 @@ export function VenueHero({ venueId, venue, height }: { venueId: number; venue: 
               label={t('app_share')}
               onPress={() => Share.share({ message: t('app_share_message', { name: venue.name }) })}
             />
-            <CircleButton
-              icon={favorite ? 'heart' : 'heart-outline'}
-              label={favorite ? t('app_unfavorite') : t('app_favorite')}
-              onPress={() => toggle(venueId)}
-            />
+            <CircleButton label={favorite ? t('app_unfavorite') : t('app_favorite')} onPress={() => toggle(venueId)}>
+              <HeartIcon active={favorite} size={22} color="#111111" />
+            </CircleButton>
           </View>
         ) : null}
       </View>

@@ -280,10 +280,7 @@ function Results({
             key={s}
             label={t(SORT_LABEL[s])}
             selected={s === sort}
-            onPress={() => {
-              tick();
-              setChosen(s);
-            }}
+            onPress={() => setChosen(s)}
           />
         ))}
         <View style={[styles.toolsDivider, { backgroundColor: c.divider }]} />
@@ -388,8 +385,8 @@ export default function HomeScreen() {
   const filtering = !!q || sportId !== undefined || quick.size > 0;
   const results: VenueFilters = { q, sport_id: sportId, ...toFilters(quick), ...nearPosition };
 
+  // A vibração vem do próprio FilterChip.
   function toggleQuick(key: QuickFilter) {
-    tick();
     setQuick((cur) => {
       const next = new Set(cur);
       if (next.has(key)) next.delete(key);
