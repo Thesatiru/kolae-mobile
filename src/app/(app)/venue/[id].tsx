@@ -22,6 +22,7 @@ import { QueryState } from '@/components/QueryState';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
 import { VenueHero } from '@/components/VenueHero';
+import { VenueSocials } from '@/components/VenueSocials';
 import { useUserPosition } from '@/location/useUserPosition';
 import { useRecentlyViewed } from '@/search/useRecentSearches';
 import { reviewStore, summarizeReviews } from '@/showcase/reviews';
@@ -291,6 +292,8 @@ export default function VenueScreen() {
                   />
                 </View>
               ) : null}
+              {/* Redes da quadra (proposta D60): some quando não há nenhuma. */}
+              <VenueSocials socials={venue.socials} />
 
               <View style={[styles.hDivider, { backgroundColor: c.divider }]} />
 
