@@ -12,6 +12,7 @@ import { Text } from '@/components/Text';
 import { VenueCover } from '@/components/VenueCover';
 import { useFavorites } from '@/favorites/FavoritesProvider';
 import { useColors } from '@/theme/useColors';
+import { venuePageUrl } from '@/utils/site';
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -98,7 +99,11 @@ export function VenueHero({ venueId, venue, height }: { venueId: number; venue: 
             <CircleButton
               icon="share-variant-outline"
               label={t('app_share')}
-              onPress={() => Share.share({ message: t('app_share_message', { name: venue.name }) })}
+              // O link vai dentro da mensagem: no Android o Share só usa "message".
+              // A página pública (D49) abre sem login e mostra nome, descrição e capa na prévia.
+              onPress={() =>
+                Share.share({ message: `${t('app_share_message', { name: venue.name })}\n${venuePageUrl(venueId)}` })
+              }
             />
             <CircleButton label={favorite ? t('app_unfavorite') : t('app_favorite')} onPress={() => toggle(venueId)}>
               <HeartIcon active={favorite} size={22} color="#111111" />
