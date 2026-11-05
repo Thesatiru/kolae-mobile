@@ -18,6 +18,7 @@ import { contrastOutline, statusColors } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
 import { dayKey, msUntilChange, nextDays } from '@/utils/date';
+import { tick } from '@/utils/haptics';
 import { formatClock, formatPrice, formatTime, noPriceLabel } from '@/utils/format';
 import i18n from '@/i18n';
 
@@ -169,7 +170,10 @@ export default function ScheduleScreen() {
                       accessibilityRole="button"
                       accessibilityState={{ selected: active }}
                       accessibilityLabel={date.toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' })}
-                      onPress={() => setSelected(key)}
+                      onPress={() => {
+                        if (!active) tick();
+                        setSelected(key);
+                      }}
                       style={[
                         styles.day,
                         active ? { backgroundColor: c.selected, borderColor: c.selected } : { borderColor: c.border },

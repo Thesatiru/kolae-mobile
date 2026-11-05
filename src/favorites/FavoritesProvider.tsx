@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '@/auth/AuthProvider';
+import { tap } from '@/utils/haptics';
 
 // Favoritos são vitrine (D04): não há endpoint nem tabela para isso, então ficam só no aparelho,
 // separados por usuário (quem entrar com outra conta no mesmo celular não vê os seus).
@@ -58,6 +59,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const toggle = useCallback(
     (id: number) => {
       if (userId === null) return;
+      tap(); // favoritar e desfavoritar "ficam": toque um pouco mais marcado (se a opção Vibração deixar)
       setStored((prev) => {
         const next = new Set(prev.userId === userId ? prev.ids : EMPTY);
         if (next.has(id)) next.delete(id);

@@ -21,6 +21,7 @@ import { MapVenueCard } from '@/map/MapVenueCard';
 import { usePreferences } from '@/preferences/PreferencesProvider';
 import { useColors } from '@/theme/useColors';
 import { msUntilNextChange } from '@/utils/date';
+import { tick } from '@/utils/haptics';
 import { formatPrice } from '@/utils/format';
 import { hasCoordinates } from '@/utils/geo';
 
@@ -191,7 +192,10 @@ export default function MapScreen() {
             key={venue.id}
             venue={venue}
             selected={venue.id === selectedId}
-            onPress={() => setSelectedId(venue.id)}
+            onPress={() => {
+              if (venue.id !== selectedId) tick();
+              setSelectedId(venue.id);
+            }}
           />
         ))}
       </MapView>

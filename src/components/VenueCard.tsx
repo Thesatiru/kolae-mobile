@@ -1,9 +1,9 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { VenueSummary } from '@/api/types';
+import { HeartIcon } from '@/components/HeartIcon';
 import { StatusBadge, statusText } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
 import { VenueCover } from '@/components/VenueCover';
@@ -49,7 +49,7 @@ export function VenueCard({ venue, width = 176 }: { venue: VenueSummary; width?:
           hitSlop={12}
           onPress={() => toggle(venue.id)}
           style={styles.heart}>
-          <MaterialCommunityIcons name={favorite ? 'heart' : 'heart-outline'} size={24} color="#FFFFFF" style={styles.heartIcon} />
+          <HeartIcon active={favorite} size={24} color="#FFFFFF" style={styles.heartIcon} />
         </Pressable>
       </View>
 

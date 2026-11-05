@@ -9,11 +9,13 @@ import { useAuth } from '@/auth/AuthProvider';
 import { PostCard } from '@/community/PostCard';
 import { Avatar, PreviewBanner } from '@/community/parts';
 import { useOpenProfile } from '@/community/useOpenProfile';
+import { HeartIcon } from '@/components/HeartIcon';
 import { PageHeader } from '@/components/PageHeader';
 import { Text, useInputFont } from '@/components/Text';
 import { commentStore, handleFor, hasLink, postStore, type Comment } from '@/showcase/community';
 import { useColors } from '@/theme/useColors';
 import { formatAgo } from '@/utils/format';
+import { tap } from '@/utils/haptics';
 
 const FIRST_COMMENTS = 3;
 
@@ -148,13 +150,12 @@ function CommentRow({ comment, onLike }: { comment: Comment; onLike: () => void 
         accessibilityLabel={`${comment.liked ? t('app_community_liked') : t('app_community_like')}, ${t('app_community_likes', { count: comment.likes })}`}
         accessibilityState={{ selected: comment.liked }}
         hitSlop={10}
-        onPress={onLike}
+        onPress={() => {
+          tap();
+          onLike();
+        }}
         style={styles.commentLike}>
-        <MaterialCommunityIcons
-          name={comment.liked ? 'heart' : 'heart-outline'}
-          size={20}
-          color={comment.liked ? c.primary : c.textMuted}
-        />
+        <HeartIcon active={comment.liked} size={20} color={comment.liked ? c.primary : c.textMuted} />
         <Text style={{ color: comment.liked ? c.link : c.textMuted, fontSize: 13 }}>{comment.likes}</Text>
       </Pressable>
     </View>

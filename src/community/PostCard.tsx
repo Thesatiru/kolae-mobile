@@ -3,10 +3,12 @@ import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { HeartIcon } from '@/components/HeartIcon';
 import { Text } from '@/components/Text';
 import { postStore, type Post } from '@/showcase/community';
 import { useColors } from '@/theme/useColors';
 import { formatAgo } from '@/utils/format';
+import { tap } from '@/utils/haptics';
 import { Avatar, OwnerBadge } from './parts';
 import { useOpenProfile } from './useOpenProfile';
 
@@ -96,13 +98,12 @@ export function PostCard({ post, onPress, large }: Props) {
             accessible={false}
             importantForAccessibility="no-hide-descendants"
             hitSlop={12}
-            onPress={() => toggleLike(post.id)}
+            onPress={() => {
+              tap();
+              toggleLike(post.id);
+            }}
             style={styles.action}>
-            <MaterialCommunityIcons
-              name={post.liked ? 'heart' : 'heart-outline'}
-              size={24}
-              color={post.liked ? c.primary : c.textMuted}
-            />
+            <HeartIcon active={post.liked} size={24} color={post.liked ? c.primary : c.textMuted} />
             <Text style={[styles.count, post.liked ? { color: c.link, fontWeight: '700' } : { color: c.textMuted }]}>
               {post.likes}
             </Text>

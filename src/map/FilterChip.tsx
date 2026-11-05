@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/Text';
 import { useColors } from '@/theme/useColors';
+import { tick } from '@/utils/haptics';
 
 type Props = {
   label: string;
@@ -18,7 +19,11 @@ export function FilterChip({ label, selected, onPress, dot, floating }: Props) {
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      onPress={onPress}
+      // Vibração leve em todo chip (Pesquisar e Mapa); a tela não precisa chamar de novo.
+      onPress={() => {
+        tick();
+        onPress();
+      }}
       hitSlop={{ top: 4, bottom: 4 }}
       style={[
         styles.chip,
