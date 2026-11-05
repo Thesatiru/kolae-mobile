@@ -25,12 +25,11 @@ function socialLinks(socials: Socials, website: string): Link[] {
 
 /**
  * Ícones redondos com as redes da quadra (Instagram, TikTok, Facebook e site).
- * Sem nenhuma rede (ou sem o campo, enquanto a API não manda), não mostra nada.
+ * Sem nenhuma rede (as quatro null, D60), não mostra nada.
  */
-export function VenueSocials({ socials }: { socials: Socials | undefined }) {
+export function VenueSocials({ socials }: { socials: Socials }) {
   const c = useColors();
   const { t } = useTranslation();
-  if (!socials) return null;
   const links = socialLinks(socials, t('app_social_website'));
   if (!links.length) return null;
 

@@ -112,12 +112,11 @@ export type VenueOwner = {
   whatsapp: string | null; // só dígitos, com DDI e DDD; null = sem botão "Falar com o dono" (D24)
 };
 
-// Redes sociais da quadra (proposta D60, docs/proposta-redes-sociais.md do João; ainda não está
-// no api.md). null = não informado, sem ícone. As quatro null escondem a linha de redes.
+// Redes sociais da quadra (D60). null = não informado, sem ícone. As quatro null escondem a linha.
 export type VenueSocials = {
-  instagram: string | null; // só o usuário, sem "@": abre https://instagram.com/<valor>
+  instagram: string | null; // só o usuário, sem "@" (letras, números, "." e "_"): abre https://instagram.com/<valor>
   tiktok: string | null; // só o usuário, sem "@": abre https://www.tiktok.com/@<valor>
-  facebook_url: string | null; // endereço completo
+  facebook_url: string | null; // endereço completo, https:// de facebook.com ou fb.com
   website_url: string | null; // endereço completo, com https://
 };
 
@@ -129,8 +128,7 @@ export type VenueDetail = Omit<VenueSummary, 'distance_km'> & {
   address: VenueAddress;
   opening_hours: OpeningHours[]; // só os dias em que abre; vazia = horário não informado (D23)
   owner: VenueOwner;
-  // Opcional até a D60 chegar na produção: sem o campo, o app trata como "sem redes".
-  socials?: VenueSocials;
+  socials: VenueSocials; // sempre presente (D60); não vem no resumo de GET /venues
 };
 
 export type ScheduleSlot = {
