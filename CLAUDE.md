@@ -219,13 +219,11 @@ Em ordem de prioridade. Apague o item quando terminar.
 
 1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
    testar pelo 4G. A v1 sai **só como APK** (decidido em 05/11): sem Play Store nem App Store.
-2. **Ver no celular e abrir o PR da `feat/search-redesign`** (Pesquisar nova, esqueletos). A
-   roleta de data e o card com status (já na `main`) também ainda não foram vistos no aparelho.
-3. **Vibração e animações no app todo**, com a opção "Vibração" nas Configurações (desligar
-   em `utils/haptics.ts`, o ponto único).
-4. **Redes sociais da quadra** no detalhe: espera o contrato
+2. **Mergear, nesta ordem:** `feat/search-redesign` (Pesquisar nova, vista no celular em 06/11),
+   `docs/guia-apk` e `feat/haptics-settings` (vibração com opção; ainda não vista no celular).
+3. **Redes sociais da quadra** no detalhe: espera o contrato
    (`docs/proposta-redes-sociais.md` do João; vira a D60). Até lá, mock seguindo a proposta.
-5. Revisar as vitrines com o aviso "Prévia" (S5).
+4. Revisar as vitrines com o aviso "Prévia" (S5).
 
 Depois da entrega (Laravel): chat e comunidade de verdade, favoritos na conta, push e as
 partidas com jogadores. Proposta em `docs/proposta-partidas.md` e lista em `docs/sugestoes.md`,
