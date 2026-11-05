@@ -188,7 +188,9 @@ src/components/              Text, Button, TextField, Screen, PageHeader, Settin
                              Carregando: Skeleton (e os de card, fileira e grade)
 src/search/                  buscas recentes (no aparelho, por pessoa, como os favoritos)
 src/theme/                   cores e useColors()
-src/utils/                   datas, formatação, mapas, soon(); haptics.tick() é o ponto
+src/map/                     pinos, filtros e card da aba Mapa; VenueMiniMap (detalhe)
+src/utils/                   datas, formatação, mapas, soon(); site.ts (links do site, como a
+                             página pública da quadra); haptics.tick() é o ponto
                              único da vibração (nunca chamar expo-haptics direto nas telas)
 tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 changelog/                   uma nota por branch (base do changelog); ver changelog/README.md
@@ -220,15 +222,25 @@ Em ordem de prioridade. Apague o item quando terminar.
 
 1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
    testar pelo 4G. A v1 sai **só como APK** (decidido em 05/11): sem Play Store nem App Store.
-2. **Mergear, nesta ordem:** `feat/search-redesign` (Pesquisar nova, vista no celular em 06/11),
-   `docs/guia-apk` e `feat/haptics-settings` (vibração com opção; ainda não vista no celular).
-3. **Redes sociais da quadra** no detalhe: espera o contrato
-   (`docs/proposta-redes-sociais.md` do João; vira a D60). Até lá, mock seguindo a proposta.
-4. Revisar as vitrines com o aviso "Prévia" (S5).
+   **Travado (05/11):** o projeto é da conta Expo `satiru` e o João entra como `slengm4n`, sem
+   acesso. Caminho: converter a `satiru` em organização e convidar a `slengm4n` (mesma keystore
+   e mesmo SHA-1); ou rodar o build logado na `satiru`.
+2. **Redes sociais da quadra:** o app está pronto com mock (PR #7). `VenueDetail.socials` é
+   **opcional** até a API mandar. Falta o site: D60, `socials` no `api.md`, banco, painel do dono,
+   API e página pública (`docs/proposta-redes-sociais.md` do João). Quando estiver na produção,
+   tirar o `?` do tipo e testar com o mock desligado.
+3. Revisar as vitrines com o aviso "Prévia" (S5): faltam o perfil de outra pessoa
+   (`user/[handle]`), seguidores, vitórias e PRO no perfil, duas etapas e alterar e-mail.
+4. Estados de erro e vazio tela por tela (S5).
+5. **Redes nos perfis das pessoas** (ideia de 05/11, sem decisão): como vitrine agora; de verdade
+   só junto da Comunidade real, depois da entrega.
 
 Depois da entrega (Laravel): chat e comunidade de verdade, favoritos na conta, push e as
 partidas com jogadores. Proposta em `docs/proposta-partidas.md` e lista em `docs/sugestoes.md`,
-no repositório do João. Nada disso entra antes de 28/11.
+no repositório do João. Também ficam para depois: entrar com Google (precisa de endpoint, pedir a
+data de nascimento no primeiro acesso e build do EAS; Apple só se houver versão para iPhone) e
+abrir o app pelo link da quadra (App Links: `assetlinks.json` no site e `intentFilters`).
+Nada disso entra antes de 28/11.
 
 ## Cronograma (igual ao docs/README.md do João)
 

@@ -19,4 +19,6 @@ Branch: `feat/venue-share` · Período: 05/11
   `/.well-known/assetlinks.json` no site e do `intentFilters` no `app.config.ts`.
 
 ## Commits
-- feat: compartilhar a quadra com o link da página pública
+- 28e0d28 · feat: compartilhar a quadra com o link da página pública
+
+PR #9.
