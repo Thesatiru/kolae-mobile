@@ -94,6 +94,12 @@ descrição curta), como nos apps que guardam curtidas e salvos fora da barra. C
 social do esporte (vitrine). Fluxo da quadra: card → informações → Agendar →
 status e agenda.
 
+Telas de entrada (login, cadastro, esqueci a senha) refeitas em 05/11 e aprovadas pelo João
+no celular (sem print em `design/`): todas usam o `AuthScaffold` (topo da marca com linhas de
+quadra que se desenham, cartão do formulário que sobe). O login mostra a proposta logo de cara
+com o `LiveTicker` (quadras de exemplo com `StatusBadge`). Cadastro em duas etapas; a data de
+nascimento é a roleta (`DateField`), sem digitar.
+
 ## Identidade visual
 
 - Cores da marca: `#0084FF`, `#000000`, `#FFFFFF`. Fonte Kanit em títulos e marca.
@@ -121,7 +127,8 @@ status e agenda.
   e a "Fonte para leitura fácil" (Atkinson Hyperlegible). Em `TextInput`, use
   `useInputFont(tamanho)` e multiplique o `fontSize` por `useFontScale()`.
   Exceções: `Logo` e `BrandSplash`, de tamanho fixo.
-- Animações: respeite `usePreferences().motionReduced`.
+- Animações: respeite `usePreferences().motionReduced` (sem animar e sem conteúdo que troca
+  sozinho). Entradas em cascata com `Appear`/`useAppear()`, que já fazem isso.
 - Leitor de tela: card ou linha com várias informações vira um elemento só (`accessible` +
   `accessibilityLabel` com a frase completa); ícone decorativo escondido; títulos com
   `accessibilityRole="header"`; erro com `accessibilityLiveRegion="polite"`; área de toque de
@@ -135,6 +142,8 @@ status e agenda.
   `src/i18n/locales/site/`, do app (prefixo `app_`) em `src/i18n/locales/app/`.
   **Toda chave nova vai nos 7 arquivos do app.** Não remover `lowerCaseLng: true`.
 - Ícones: `@expo/vector-icons` (MaterialCommunityIcons); imagens com `expo-image`
+- Animações com `react-native-reanimated` (e `Animated` do RN na roleta); vibração com
+  `expo-haptics` (`selectionAsync` para "catraca", sem exagero)
 - Mapa: `react-native-maps` + `expo-location`. No APK precisa de **chave própria do Google
   Maps para Android** (Maps SDK for Android, restrita ao pacote do app e à assinatura do
   build), senão o mapa fica cinza. A chave do site (`kolae.online`) é outra.
@@ -173,9 +182,12 @@ src/showcase/                dados de vitrine
 src/profile/                 ProfileView (próprio perfil e de outra pessoa), trocar a foto
 src/components/              Text, Button, TextField, Screen, PageHeader, SettingsList,
                              StatusBadge, VenueCard, QueryState, Logo, CurvedHeader...
+                             Entrada: AuthScaffold, CourtLines, LiveTicker. Formulário:
+                             DateField (roleta) e WheelPicker. Animação: Appear
 src/theme/                   cores e useColors()
 src/utils/                   datas, formatação, mapas, soon()
 tools/convert-lang.mjs       converte os lang/*.php do site para JSON
+changelog/                   uma nota por branch (base do changelog); ver changelog/README.md
 ```
 
 ## Regras do código
@@ -193,6 +205,10 @@ tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 - Status da quadra: sempre o mesmo `StatusBadge` (selo e faixa), nunca recriar.
 - Rodar `npx tsc --noEmit` antes de considerar uma tarefa pronta.
 - Um commit por etapa concluída.
+- Uma branch por assunto (`feat/...`, `fix/...`), saindo da `main`. Cada branch anota o que
+  mudou para quem usa em `changelog/<nome-da-branch>.md` (sem `feat/`), atualizado a cada commit.
+- Windows (máquina do João): rodar o Expo no PowerShell, não no WSL, com
+  `npx.cmd expo start --offline` (sem login no Expo CLI a pergunta de conta trava o Expo Go).
 
 ## Pendências
 
