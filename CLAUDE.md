@@ -199,8 +199,19 @@ tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 Em ordem de prioridade. Apague o item quando terminar.
 
 1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
-   testar pelo 4G.
-2. Revisar as vitrines com o aviso "Prévia" (S5).
+   testar pelo 4G. A v1 sai **só como APK** (decidido em 05/11): sem Play Store nem App Store.
+2. **Abrir os PRs** das branches prontas: `feat/auth-redesign` (telas de entrada, roleta de
+   data, loading) e `feat/venue-card-status` (status e distância no card). Notas em `changelog/`.
+3. **Pesquisar nova** (`feat/search-redesign`): cabeçalho com "quadras livres agora", buscas
+   recentes, filtros em chips e carregamento em esqueleto no `QueryState`.
+4. **Vibração e animações no app todo**, com a opção "Vibração" nas Configurações.
+5. **Redes sociais da quadra** no detalhe: espera o contrato
+   (`docs/proposta-redes-sociais.md` do João; vira a D60). Até lá, mock seguindo a proposta.
+6. Revisar as vitrines com o aviso "Prévia" (S5).
+
+Depois da entrega (Laravel): chat e comunidade de verdade, favoritos na conta, push e as
+partidas com jogadores. Proposta em `docs/proposta-partidas.md` e lista em `docs/sugestoes.md`,
+no repositório do João. Nada disso entra antes de 28/11.
 
 ## Cronograma (igual ao docs/README.md do João)
 
