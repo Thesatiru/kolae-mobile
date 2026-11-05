@@ -183,9 +183,12 @@ src/profile/                 ProfileView (próprio perfil e de outra pessoa), tr
 src/components/              Text, Button, TextField, Screen, PageHeader, SettingsList,
                              StatusBadge, VenueCard, QueryState, Logo, CurvedHeader...
                              Entrada: AuthScaffold, CourtLines, LiveTicker. Formulário:
-                             DateField (roleta) e WheelPicker. Animação: Appear
+                             DateField (roleta) e WheelPicker. Animação: Appear.
+                             Carregando: Skeleton (e os de card, fileira e grade)
+src/search/                  buscas recentes (no aparelho, por pessoa, como os favoritos)
 src/theme/                   cores e useColors()
-src/utils/                   datas, formatação, mapas, soon()
+src/utils/                   datas, formatação, mapas, soon(); haptics.tick() é o ponto
+                             único da vibração (nunca chamar expo-haptics direto nas telas)
 tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 changelog/                   uma nota por branch (base do changelog); ver changelog/README.md
 ```
@@ -216,14 +219,13 @@ Em ordem de prioridade. Apague o item quando terminar.
 
 1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
    testar pelo 4G. A v1 sai **só como APK** (decidido em 05/11): sem Play Store nem App Store.
-2. **Abrir os PRs** das branches prontas: `feat/auth-redesign` (telas de entrada, roleta de
-   data, loading) e `feat/venue-card-status` (status e distância no card). Notas em `changelog/`.
-3. **Pesquisar nova** (`feat/search-redesign`): cabeçalho com "quadras livres agora", buscas
-   recentes, filtros em chips e carregamento em esqueleto no `QueryState`.
-4. **Vibração e animações no app todo**, com a opção "Vibração" nas Configurações.
-5. **Redes sociais da quadra** no detalhe: espera o contrato
+2. **Ver no celular e abrir o PR da `feat/search-redesign`** (Pesquisar nova, esqueletos). A
+   roleta de data e o card com status (já na `main`) também ainda não foram vistos no aparelho.
+3. **Vibração e animações no app todo**, com a opção "Vibração" nas Configurações (desligar
+   em `utils/haptics.ts`, o ponto único).
+4. **Redes sociais da quadra** no detalhe: espera o contrato
    (`docs/proposta-redes-sociais.md` do João; vira a D60). Até lá, mock seguindo a proposta.
-6. Revisar as vitrines com o aviso "Prévia" (S5).
+5. Revisar as vitrines com o aviso "Prévia" (S5).
 
 Depois da entrega (Laravel): chat e comunidade de verdade, favoritos na conta, push e as
 partidas com jogadores. Proposta em `docs/proposta-partidas.md` e lista em `docs/sugestoes.md`,
