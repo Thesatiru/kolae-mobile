@@ -7,6 +7,8 @@ Branch: `feat/venue-socials` · Período: 05/11
 - No detalhe da quadra, abaixo do "Falar com o dono", aparecem os ícones das redes da quadra
   (Instagram, TikTok, Facebook e site). Cada um abre o perfil no app da rede ou no navegador.
   Quadra sem nenhuma rede não mostra a linha.
+- Horário de funcionamento com os dias escritos certo: "Segunda-feira" (antes, "Segunda-Feira").
+- Cada tipo de piso tem o seu ícone (antes, todos apareciam com o de grama).
 
 ## Para quem desenvolve
 
@@ -22,6 +24,9 @@ Branch: `feat/venue-socials` · Período: 05/11
   o link.
 - Chaves novas nos 7 idiomas: `app_socials`, `app_social_website`, `app_social_a11y`,
   `app_social_hint`.
+- `floorIcon()` em `src/utils/floorIcons.ts` (um ícone por chave de piso) e `capitalizeFirst()`
+  em `src/utils/format.ts` (o `textTransform: 'capitalize'` punha maiúscula depois do hífen).
 
 ## Commits
-- 9ff5312 · feat: redes sociais da quadra no detalhe (mock da proposta D60)
+- f083350 · feat: redes sociais da quadra no detalhe (mock da proposta D60)
+- fix: dias da semana com maiúscula só no começo e ícone por tipo de piso
