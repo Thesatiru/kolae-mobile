@@ -7,7 +7,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Slot, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/auth/AuthProvider';
 import { BrandSplash } from '@/components/BrandSplash';
@@ -20,8 +21,6 @@ import { useColors } from '@/theme/useColors';
 // Segura a splash nativa (azul) até a nossa BrandSplash estar pronta para assumir.
 SplashScreen.preventAutoHideAsync();
 
-const SPLASH_MIN_MS = 1200; // tempo mínimo da marca na tela, sem travar o app à toa
-
 const queryClient = new QueryClient({
   // Ao reconectar, recarrega as telas abertas mesmo que os dados ainda não estejam "velhos".
   defaultOptions: { queries: { retry: 1, staleTime: 60_000, refetchOnReconnect: 'always' } },
@@ -29,30 +28,32 @@ const queryClient = new QueryClient({
 
 function RootNavigator({ fontsLoaded }: { fontsLoaded: boolean }) {
   const { loading } = useAuth();
-  const { ready: prefsReady } = usePreferences();
+  const { ready: prefsReady, motionReduced } = usePreferences();
   const c = useColors();
-  const [minElapsed, setMinElapsed] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setMinElapsed(true), SPLASH_MIN_MS);
-    return () => clearTimeout(timer);
-  }, []);
+  const [splashVisible, setSplashVisible] = useState(true);
+  const hideSplash = useCallback(() => setSplashVisible(false), []);
 
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null; // a splash nativa ainda está na tela
-  // Espera as preferências para não piscar o tema padrão antes do escolhido.
-  if (loading || !prefsReady || !minElapsed) return <BrandSplash />;
+  // Espera a sessão e as preferências para não piscar o login nem o tema padrão antes do escolhido.
+  const ready = !loading && prefsReady;
   return (
-    <ThemeProvider value={c.scheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <StatusBar style={c.scheme === 'dark' ? 'light' : 'dark'} />
-      <ToastProvider>
-        <Slot />
-        <OfflineBanner />
-      </ToastProvider>
-    </ThemeProvider>
+    <View style={styles.root}>
+      {ready ? (
+        <ThemeProvider value={c.scheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <StatusBar style={c.scheme === 'dark' ? 'light' : 'dark'} />
+          <ToastProvider>
+            <Slot />
+            <OfflineBanner />
+          </ToastProvider>
+        </ThemeProvider>
+      ) : null}
+      {/* Por cima do app já montado: quando tudo fica pronto, some com um fade e sai da árvore. */}
+      {splashVisible ? <BrandSplash leaving={ready} onHidden={hideSplash} motionReduced={motionReduced} /> : null}
+    </View>
   );
 }
 
@@ -77,3 +78,5 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+const styles = StyleSheet.create({ root: { flex: 1 } });
