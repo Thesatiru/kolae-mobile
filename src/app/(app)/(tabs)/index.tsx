@@ -1,12 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { listSports, listVenues } from '@/api/venues';
-import type { Sport, VenueFilters } from '@/api/types';
+import type { Sport, VenueFilters, VenueSort, VenueSummary } from '@/api/types';
 import { useAuth } from '@/auth/AuthProvider';
 import { Appear } from '@/components/Appear';
 import { Button } from '@/components/Button';
@@ -14,15 +14,17 @@ import { usePullToRefresh } from '@/components/PullToRefresh';
 import { QueryState } from '@/components/QueryState';
 import { RainbowStripe } from '@/components/Rainbow';
 import { Screen } from '@/components/Screen';
-import { VenueGridSkeleton, VenueRowSkeleton } from '@/components/Skeleton';
+import { Skeleton, VenueGridSkeleton, VenueRowSkeleton } from '@/components/Skeleton';
 import { Text, useInputFont } from '@/components/Text';
-import { VenueCard } from '@/components/VenueCard';
 import { fieldBoxStyle } from '@/components/TextField';
+import { VenueCard } from '@/components/VenueCard';
 import { useUserPosition } from '@/location/useUserPosition';
 import { FilterChip } from '@/map/FilterChip';
-import { usePreferences } from '@/preferences/PreferencesProvider';
-import { useRecentSearches } from '@/search/useRecentSearches';
-import { contrastOutline, linkDecoration, statusColors } from '@/theme/colors';
+import { LiveDot } from '@/search/LiveDot';
+import { LocationPrompt } from '@/search/LocationPrompt';
+import { NearestFreeCard } from '@/search/NearestFreeCard';
+import { useRecentSearches, useRecentlyViewed } from '@/search/useRecentSearches';
+import { contrastOutline, linkDecoration } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
 import { msUntilNextChange } from '@/utils/date';
@@ -32,6 +34,7 @@ import { sportIcon } from '@/utils/sportIcons';
 const SIDE = 20; // margem lateral da tela
 const GAP = 16; // entre os cards
 const CASCADE_MAX = 8; // só os primeiros cards entram em cascata (o resto já aparece)
+const ALL_VENUES: VenueFilters = { per_page: 100 }; // mesma consulta dos Favoritos (cache em comum)
 
 // Filtros rápidos (chips). Cada um vira um parâmetro de GET /venues.
 type QuickFilter = 'available' | 'free' | 'covered' | 'lighting' | 'leisure';
@@ -42,6 +45,8 @@ const QUICK_FILTERS: { key: QuickFilter; label: string; dot?: boolean }[] = [
   { key: 'lighting', label: 'app_filter_lighting' },
   { key: 'leisure', label: 'app_leisure_area' },
 ];
+
+const SORT_LABEL: Record<VenueSort, string> = { distance: 'app_sort_distance', price: 'app_sort_price', name: 'app_sort_name' };
 
 function toFilters(active: Set<QuickFilter>): VenueFilters {
   return {
@@ -71,24 +76,6 @@ function useVenues(filters: VenueFilters, enabled = true) {
     enabled,
     refetchInterval: (q) => msUntilNextChange(q.state.data?.data),
   });
-}
-
-// Bolinha "ao vivo" do resumo: pulsa devagar; parada com movimento reduzido.
-function LiveDot() {
-  const { motionReduced } = usePreferences();
-  const scale = useSharedValue(1);
-  useEffect(() => {
-    if (motionReduced) return;
-    scale.value = withRepeat(withTiming(1.9, { duration: 1100 }), -1, false);
-  }, [motionReduced, scale]);
-  const ring = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }], opacity: 2 - scale.value }));
-  const color = statusColors.available.accent;
-  return (
-    <View style={styles.liveDot}>
-      {motionReduced ? null : <Animated.View style={[styles.liveRing, { borderColor: color }, ring]} />}
-      <View style={[styles.liveCore, { backgroundColor: color }]} />
-    </View>
-  );
 }
 
 // "Olá, João!" e "● 5 quadras livres agora ›" (tocar liga o filtro "Livre agora").
@@ -148,35 +135,73 @@ function SportChip({ sport, selected, onPress }: { sport: Sport; selected: boole
   );
 }
 
+function SectionHead({ title, right }: { title: string; right?: React.ReactNode }) {
+  const c = useColors();
+  return (
+    <View style={styles.sectionHead}>
+      <Text accessibilityRole="header" style={[styles.sectionTitle, { color: c.text }]}>
+        {title}
+      </Text>
+      {right}
+    </View>
+  );
+}
+
+// Fileira horizontal de cards, os primeiros entrando em cascata.
+function VenueRow({ venues }: { venues: VenueSummary[] }) {
+  return (
+    <FlatList
+      data={venues}
+      keyExtractor={(v) => String(v.id)}
+      renderItem={({ item, index }) =>
+        index < CASCADE_MAX ? (
+          <Appear index={index}>
+            <VenueCard venue={item} />
+          </Appear>
+        ) : (
+          <VenueCard venue={item} />
+        )
+      }
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.row}
+    />
+  );
+}
+
 // Seção horizontal da tela inicial ("Perto de você", "Disponíveis agora").
+// exclude: a quadra que já está no destaque não se repete aqui; sem nenhuma outra, a seção some.
 function VenueSection({
   title,
   filters,
   enabled = true,
+  exclude,
   onSeeAll,
 }: {
   title: string;
   filters: VenueFilters;
   enabled?: boolean;
+  exclude?: number;
   onSeeAll?: () => void;
 }) {
   const c = useColors();
   const { t } = useTranslation();
   const query = useVenues(filters, enabled);
-  const venues = query.data?.data ?? [];
+  const venues = (query.data?.data ?? []).filter((v) => v.id !== exclude);
+  if (exclude !== undefined && query.isSuccess && venues.length === 0) return null;
 
   return (
     <View>
-      <View style={styles.sectionHead}>
-        <Text accessibilityRole="header" style={[styles.sectionTitle, { color: c.text }]}>
-          {title}
-        </Text>
-        {onSeeAll && venues.length ? (
-          <Text accessibilityRole="button" onPress={onSeeAll} style={[styles.seeAll, { color: c.link }, linkDecoration(c)]}>
-            {t('app_see_all')}
-          </Text>
-        ) : null}
-      </View>
+      <SectionHead
+        title={title}
+        right={
+          onSeeAll && venues.length ? (
+            <Text accessibilityRole="button" onPress={onSeeAll} style={[styles.seeAll, { color: c.link }, linkDecoration(c)]}>
+              {t('app_see_all')}
+            </Text>
+          ) : null
+        }
+      />
       <QueryState
         loading={query.isPending}
         error={query.error}
@@ -185,49 +210,85 @@ function VenueSection({
         onRetry={query.refetch}
         minHeight={220}
         skeleton={<VenueRowSkeleton />}>
-        <FlatList
-          data={venues}
-          keyExtractor={(v) => String(v.id)}
-          renderItem={({ item, index }) =>
-            index < CASCADE_MAX ? (
-              <Appear index={index}>
-                <VenueCard venue={item} />
-              </Appear>
-            ) : (
-              <VenueCard venue={item} />
-            )
-          }
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.row}
-        />
+        <VenueRow venues={venues} />
       </QueryState>
     </View>
   );
 }
 
-// Com busca ou filtro: uma grade só, com a contagem e o "Limpar filtros" quando não acha nada.
-function Results({ filters, enabled, onClear }: { filters: VenueFilters; enabled: boolean; onClear: () => void }) {
+// "Vistas recentemente": ids guardados no aparelho, dados (e status) sempre da API.
+// Seção secundária: sem nada visto, com erro ou sem as quadras na lista, simplesmente some.
+function RecentlyViewedSection() {
+  const { t } = useTranslation();
+  const { items } = useRecentlyViewed();
+  const query = useVenues(ALL_VENUES, items.length > 0);
+  if (!items.length || query.error) return null;
+  const byId = new Map((query.data?.data ?? []).map((v) => [v.id, v]));
+  const venues = items.map((id) => byId.get(id)).filter((v): v is VenueSummary => !!v);
+  if (query.isSuccess && !venues.length) return null;
+
+  return (
+    <View>
+      <SectionHead title={t('app_recently_viewed')} />
+      {query.isPending ? <VenueRowSkeleton /> : <VenueRow venues={venues} />}
+    </View>
+  );
+}
+
+// Com busca ou filtro: uma grade só, com a contagem, a ordem, "Ver no mapa" e o
+// "Limpar filtros" quando não acha nada.
+function Results({
+  filters,
+  enabled,
+  hasPosition,
+  onClear,
+  onSeeOnMap,
+}: {
+  filters: VenueFilters;
+  enabled: boolean;
+  hasPosition: boolean;
+  onClear: () => void;
+  onSeeOnMap: () => void;
+}) {
   const c = useColors();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const cardWidth = Math.floor((width - SIDE * 2 - GAP) / 2);
-  const query = useVenues({ ...filters, per_page: 40 }, enabled);
+  const sorts: VenueSort[] = hasPosition ? ['distance', 'price', 'name'] : ['price', 'name'];
+  const [chosen, setChosen] = useState<VenueSort | null>(null);
+  // "Mais perto" exige a posição (sort=distance sem lat/lng é 422): sem ela, cai para "Nome".
+  const sort = chosen && sorts.includes(chosen) ? chosen : hasPosition ? 'distance' : 'name';
+  const query = useVenues({ ...filters, sort, per_page: 40 }, enabled);
   const venues = query.data?.data ?? [];
   const total = query.data?.meta.total;
 
   return (
     <View>
-      <View style={styles.sectionHead}>
-        <Text accessibilityRole="header" style={[styles.sectionTitle, { color: c.text }]}>
-          {t('app_results')}
-        </Text>
-        {total !== undefined ? (
-          <Text accessibilityLiveRegion="polite" style={[styles.count, { color: c.textMuted }]}>
-            {t('app_results_count', { count: total })}
-          </Text>
-        ) : null}
-      </View>
+      <SectionHead
+        title={t('app_results')}
+        right={
+          total !== undefined ? (
+            <Text accessibilityLiveRegion="polite" style={[styles.count, { color: c.textMuted }]}>
+              {t('app_results_count', { count: total })}
+            </Text>
+          ) : null
+        }
+      />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tools}>
+        {sorts.map((s) => (
+          <FilterChip
+            key={s}
+            label={t(SORT_LABEL[s])}
+            selected={s === sort}
+            onPress={() => {
+              tick();
+              setChosen(s);
+            }}
+          />
+        ))}
+        <View style={[styles.toolsDivider, { backgroundColor: c.divider }]} />
+        <Button variant="outline" compact icon="map-outline" title={t('app_see_on_map')} onPress={onSeeOnMap} />
+      </ScrollView>
       <QueryState
         loading={query.isPending}
         error={query.error}
@@ -254,7 +315,12 @@ function Results({ filters, enabled, onClear }: { filters: VenueFilters; enabled
 }
 
 // Buscas recentes, embaixo do campo enquanto ele está em foco e vazio.
-function RecentSearches({ items, onPick, onRemove, onClear }: {
+function RecentSearches({
+  items,
+  onPick,
+  onRemove,
+  onClear,
+}: {
   items: string[];
   onPick: (term: string) => void;
   onRemove: (term: string) => void;
@@ -313,9 +379,14 @@ export default function HomeScreen() {
   // "Perto de você" precisa da posição (sort=distance sem lat/lng é 422); sem ela, lista todas.
   const { position, ready } = useUserPosition();
   const near: VenueFilters = position ? { lat: position.latitude, lng: position.longitude, sort: 'distance' } : {};
+  const nearPosition: VenueFilters = position ? { lat: position.latitude, lng: position.longitude } : {};
+
+  // Mesma consulta da seção "Disponíveis agora": a primeira (a mais perto) vira o destaque.
+  const available = useVenues({ status: 'available', ...near }, ready);
+  const highlight = available.data?.data[0];
 
   const filtering = !!q || sportId !== undefined || quick.size > 0;
-  const results: VenueFilters = { q, sport_id: sportId, ...toFilters(quick), ...near };
+  const results: VenueFilters = { q, sport_id: sportId, ...toFilters(quick), ...nearPosition };
 
   function toggleQuick(key: QuickFilter) {
     tick();
@@ -331,6 +402,24 @@ export default function HomeScreen() {
     setSearch('');
     setSportId(undefined);
     setQuick(new Set());
+  }
+
+  // Abre a aba Mapa com os mesmos filtros ("1" = ligado; "at" faz o mapa aplicar uma vez).
+  function seeOnMap() {
+    const on = (key: QuickFilter) => (quick.has(key) ? '1' : '');
+    router.navigate({
+      pathname: '/map',
+      params: {
+        at: String(Date.now()),
+        q: search.trim(),
+        sport: sportId !== undefined ? String(sportId) : '',
+        available: on('available'),
+        free: on('free'),
+        covered: on('covered'),
+        lighting: on('lighting'),
+        leisure: on('leisure'),
+      },
+    });
   }
 
   const showRecent = focused && !search && recent.items.length > 0;
@@ -407,15 +496,30 @@ export default function HomeScreen() {
       />
 
       {filtering ? (
-        <Results filters={results} enabled={ready} onClear={clearAll} />
+        <Results filters={results} enabled={ready} hasPosition={!!position} onClear={clearAll} onSeeOnMap={seeOnMap} />
       ) : (
         <>
+          {available.isPending ? (
+            <View style={styles.highlightSkeleton}>
+              <Skeleton width="100%" height={290} radius={22} />
+            </View>
+          ) : highlight ? (
+            <Appear>
+              <NearestFreeCard venue={highlight} nearest={!!position} />
+            </Appear>
+          ) : null}
+
+          {ready && !position ? <LocationPrompt /> : null}
+
+          <RecentlyViewedSection />
+
           <VenueSection title={t(position ? 'app_section_near' : 'app_section_all')} filters={near} enabled={ready} />
           {/* D33: "Mais avaliadas" virou "Disponíveis agora" (avaliação é vitrine). */}
           <VenueSection
             title={t('app_section_available')}
             filters={{ status: 'available', ...near }}
             enabled={ready}
+            exclude={highlight?.id}
             onSeeAll={() => toggleQuick('available')}
           />
         </>
@@ -430,9 +534,6 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 30, lineHeight: 38, fontFamily: fonts.medium },
   summary: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 28, alignSelf: 'flex-start' },
   summaryText: { fontSize: 15 },
-  liveDot: { width: 12, height: 12, alignItems: 'center', justifyContent: 'center' },
-  liveRing: { position: 'absolute', width: 12, height: 12, borderRadius: 6, borderWidth: 2 },
-  liveCore: { width: 8, height: 8, borderRadius: 4 },
   searchWrap: { paddingHorizontal: SIDE, gap: 8 },
   search: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingHorizontal: 16, minHeight: 54 },
   searchInput: { flex: 1, paddingVertical: 12 },
@@ -449,10 +550,13 @@ const styles = StyleSheet.create({
   chipCircle: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   chipText: { fontSize: 14 },
   chipLine: { height: 2, alignSelf: 'stretch', marginTop: 4 },
+  highlightSkeleton: { paddingHorizontal: SIDE },
   sectionHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, paddingHorizontal: SIDE, marginBottom: 14 },
   sectionTitle: { flexShrink: 1, fontSize: 22, fontFamily: fonts.medium },
   seeAll: { fontSize: 15, fontWeight: '600', paddingVertical: 10 },
   count: { fontSize: 14 },
+  tools: { paddingHorizontal: SIDE, gap: 8, alignItems: 'center', marginBottom: 16 },
+  toolsDivider: { width: 1, height: 28, marginHorizontal: 4 },
   row: { paddingHorizontal: SIDE, gap: GAP },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP, paddingHorizontal: SIDE },
 });
