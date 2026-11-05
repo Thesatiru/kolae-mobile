@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import MapView, { type Region } from 'react-native-maps';
@@ -29,6 +29,18 @@ const DEFAULT_REGION: Region = { latitude: -23.54, longitude: -46.34, latitudeDe
 const NEAR_DELTA = 0.05;
 const LEGEND: VenueStatus[] = ['available', 'in_use', 'closed'];
 
+// Parâmetros que a Pesquisar manda no "Ver no mapa" ("1" = filtro ligado).
+export type MapRouteParams = {
+  at?: string;
+  q?: string;
+  sport?: string;
+  available?: string;
+  free?: string;
+  covered?: string;
+  lighting?: string;
+  leisure?: string;
+};
+
 function useDebounced<T>(value: T, ms = 350) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -55,6 +67,24 @@ export default function MapScreen() {
   const [filters, setFilters] = useState<MapFilters>({});
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  // "Ver no mapa" da Pesquisar abre esta aba com os mesmos filtros (parâmetros da rota).
+  // "at" muda a cada toque: aplica uma vez por pedido, e depois a pessoa mexe à vontade.
+  const incoming = useLocalSearchParams<MapRouteParams>();
+  const [appliedAt, setAppliedAt] = useState<string | undefined>(undefined);
+  if (incoming.at && incoming.at !== appliedAt) {
+    setAppliedAt(incoming.at);
+    setSearch(incoming.q ?? '');
+    setSportId(incoming.sport ? Number(incoming.sport) : undefined);
+    setAvailableNow(incoming.available === '1');
+    setFilters({
+      maxPriceCents: incoming.free === '1' ? 0 : undefined,
+      isCovered: incoming.covered === '1' || undefined,
+      hasLighting: incoming.lighting === '1' || undefined,
+      hasLeisureArea: incoming.leisure === '1' || undefined,
+    });
+    setSelectedId(null);
+  }
 
   const params: VenueFilters = {
     q,

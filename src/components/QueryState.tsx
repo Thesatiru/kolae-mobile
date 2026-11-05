@@ -16,13 +16,29 @@ type Props = {
   minHeight?: number;
   /** "screen" quando a tela inteira depende destes dados (ex.: informações da quadra). */
   errorVariant?: 'screen' | 'inline';
+  /** Esqueleto no formato do conteúdo (ex.: <VenueRowSkeleton />) no lugar da bolinha girando. */
+  skeleton?: React.ReactNode;
+  /** Ação embaixo do texto de vazio (ex.: "Limpar filtros"). */
+  emptyAction?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export function QueryState({ loading, error, empty, emptyText, onRetry, minHeight = 120, errorVariant, children }: Props) {
+export function QueryState({
+  loading,
+  error,
+  empty,
+  emptyText,
+  onRetry,
+  minHeight = 120,
+  errorVariant,
+  skeleton,
+  emptyAction,
+  children,
+}: Props) {
   const c = useColors();
   const { t } = useTranslation();
 
+  if (loading && skeleton) return <>{skeleton}</>;
   if (loading) {
     return (
       <View style={[styles.center, { minHeight }]}>
@@ -41,6 +57,7 @@ export function QueryState({ loading, error, empty, emptyText, onRetry, minHeigh
           <LogoMark color={c.scheme === 'dark' ? c.textMuted : c.border} colors={c.rainbow} height={44} />
         </View>
         <Text style={[styles.empty, { color: c.textMuted }]}>{emptyText}</Text>
+        {emptyAction}
       </View>
     );
   }
