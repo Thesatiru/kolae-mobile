@@ -76,6 +76,9 @@ usuário (AsyncStorage, `src/favorites/`), e também não vão para a API.
 - **Fotos:** `cover_image_url`, `images` e `avatar_url` podem vir `null` (ou fora da lista)
   quando o arquivo não existe no servidor: mostrar a imagem padrão.
 - **Descrição:** `description` `null` esconde a seção "Sobre a quadra" (D30).
+- **Redes da quadra** (D60): `socials` vem sempre no detalhe (nunca na lista), com `null` no que
+  o dono não informou; as quatro `null` escondem a linha. Instagram e TikTok vêm só com o
+  usuário: o app monta o link. Facebook e site abrem como vieram.
 - **Distância no detalhe:** calculada no app com a posição da pessoa e as coordenadas (D33).
 - **Agenda:** dia sem funcionamento vem com `opens_at`/`closes_at` `null` e `slots` vazio:
   mostrar "Fechada neste dia". `opening_hours` vazio no detalhe = "Horário não informado"
@@ -225,10 +228,9 @@ Em ordem de prioridade. Apague o item quando terminar.
    **Travado (05/11):** o projeto é da conta Expo `satiru` e o João entra como `slengm4n`, sem
    acesso. Caminho: converter a `satiru` em organização e convidar a `slengm4n` (mesma keystore
    e mesmo SHA-1); ou rodar o build logado na `satiru`.
-2. **Redes sociais da quadra:** o app está pronto com mock (PR #7). `VenueDetail.socials` é
-   **opcional** até a API mandar. Falta o site: D60, `socials` no `api.md`, banco, painel do dono,
-   API e página pública (`docs/proposta-redes-sociais.md` do João). Quando estiver na produção,
-   tirar o `?` do tipo e testar com o mock desligado.
+2. **Testar as redes da quadra de ponta a ponta:** a D60 está na produção desde 05/11, mas
+   nenhuma quadra real tinha rede cadastrada. Cadastrar numa quadra pelo painel do site e abrir
+   no app com o mock desligado.
 3. Revisar as vitrines com o aviso "Prévia" (S5): faltam o perfil de outra pessoa
    (`user/[handle]`), seguidores, vitórias e PRO no perfil, duas etapas e alterar e-mail.
 4. Estados de erro e vazio tela por tela (S5).
