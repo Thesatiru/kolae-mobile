@@ -9,11 +9,17 @@ import { QueryState } from '@/components/QueryState';
 import { Screen } from '@/components/Screen';
 import { VenueCard } from '@/components/VenueCard';
 import { useFavorites } from '@/favorites/FavoritesProvider';
+import { msUntilNextChange } from '@/utils/date';
 
 export default function FavoritesScreen() {
   const { t } = useTranslation();
   const { ids } = useFavorites();
-  const query = useQuery({ queryKey: ['venues', { per_page: 100 }], queryFn: () => listVenues({ per_page: 100 }) });
+  // O card mostra o status: busca de novo quando algum vence (D03).
+  const query = useQuery({
+    queryKey: ['venues', { per_page: 100 }],
+    queryFn: () => listVenues({ per_page: 100 }),
+    refetchInterval: (q) => msUntilNextChange(q.state.data?.data),
+  });
   const favorites = (query.data?.data ?? []).filter((v) => ids.has(v.id));
   const refreshControl = usePullToRefresh(query.refetch);
 

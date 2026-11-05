@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import type { VenueStatus } from '@/api/types';
@@ -20,17 +21,23 @@ export function StatusDot({ status, size = 8, color }: { status: VenueStatus; si
   );
 }
 
+/** A frase do selo ("Disponível · até 19:00"), também para montar o rótulo do leitor de tela. */
+export function statusText(t: TFunction, status: VenueStatus, until: string | null): string {
+  const label = t(`app_status_${status}`);
+  const time = until ? t(`app_status_${status}_until`, { time: formatTime(until) }) : null;
+  return time ? `${label} · ${time}` : label;
+}
+
 // Selo "Disponível · até 19:00" / "Em uso · até 21:00" / "Fechada · abre às 8:00".
+// Em espaço estreito (card nos Favoritos, idiomas longos), o texto quebra em vez de vazar.
 export function StatusBadge({ status, until }: { status: VenueStatus; until: string | null }) {
   const { t } = useTranslation();
   const colors = statusColors[status];
-  const label = t(`app_status_${status}`);
-  const time = until ? t(`app_status_${status}_until`, { time: formatTime(until) }) : null;
 
   return (
     <View accessible style={[styles.badge, { backgroundColor: colors.background }]}>
       <StatusDot status={status} />
-      <Text style={[styles.text, { color: colors.text }]}>{time ? `${label} · ${time}` : label}</Text>
+      <Text style={[styles.text, { color: colors.text }]}>{statusText(t, status, until)}</Text>
     </View>
   );
 }
@@ -69,12 +76,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
+    maxWidth: '100%',
     gap: 6,
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  text: { fontSize: 13, fontWeight: '700' },
+  text: { flexShrink: 1, fontSize: 13, fontWeight: '700' },
   banner: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: 20, padding: 14 },
   bannerIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   bannerText: { flex: 1, gap: 2 },
