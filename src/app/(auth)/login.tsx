@@ -1,27 +1,24 @@
-import { Link } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { router } from 'expo-router';
+import { useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/auth/AuthProvider';
+import { Appear } from '@/components/Appear';
+import { AuthScaffold } from '@/components/AuthScaffold';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
-import { CurvedHeader } from '@/components/CurvedHeader';
-import { LogoMark } from '@/components/Logo';
-import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { TextField } from '@/components/TextField';
+import { FieldError, TextField, type TextFieldRef } from '@/components/TextField';
 import { linkDecoration } from '@/theme/colors';
-import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
 import { errorMessage } from '@/utils/errorMessage';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
   const c = useColors();
-  const { width } = useWindowDimensions();
   const { signIn } = useAuth();
+  const passwordRef = useRef<TextFieldRef>(null);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,68 +41,75 @@ export default function LoginScreen() {
   }
 
   return (
-    <Screen edges={['bottom']} contentStyle={styles.content}>
-      <StatusBar style={c.brandStatusBar} />
-      <CurvedHeader>
-        <LogoMark color={c.onBrand} colors={c.rainbow} height={width * 0.38} />
-      </CurvedHeader>
-
-      <View style={styles.form}>
-        <Text accessibilityRole="header" style={[styles.title, { color: c.primary }]}>{t('app_login_title')}</Text>
-
+    <AuthScaffold hero title={t('app_login_title')}>
+      <Appear index={0}>
         <TextField
           label={t('global_email')}
           placeholder={t('app_email_ph')}
-          icon="account-outline"
+          icon="email-outline"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           autoComplete="email"
           keyboardType="email-address"
+          returnKeyType="next"
+          submitBehavior="submit"
+          onSubmitEditing={() => passwordRef.current?.focus()}
         />
+      </Appear>
+      <Appear index={1}>
         <TextField
+          ref={passwordRef}
           label={t('global_senha')}
           icon="lock-outline"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          revealable
           autoComplete="current-password"
+          returnKeyType="go"
           onSubmitEditing={handleLogin}
         />
+      </Appear>
 
-        <View style={styles.options}>
-          <Checkbox checked={remember} onChange={setRemember} label={t('login_remember')} />
-          <Link href="/forgot-password" style={[styles.link, styles.underline, { color: c.text }]}>
-            {t('app_forgot')}
-          </Link>
-        </View>
+      <Appear index={2} style={styles.options}>
+        <Checkbox checked={remember} onChange={setRemember} label={t('login_remember')} />
+        {/* Text com onPress, e não <Link asChild>: o expo-router quebra se o filho do Link tiver lista de estilos. */}
+        <Text
+          accessibilityRole="link"
+          onPress={() => router.push('/forgot-password')}
+          style={[styles.link, { color: c.link }, linkDecoration(c)]}>
+          {t('app_forgot')}
+        </Text>
+      </Appear>
 
-        {error ? <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={[styles.error, { color: c.danger }]}>{error}</Text> : null}
+      <FieldError message={error ?? undefined} />
 
-        {/* Empurra o botão para baixo, como no design, sem cortar em telas pequenas. */}
-        <View style={styles.spacer} />
-
+      <Appear index={3}>
         <Button title={t('login_btn_entry')} onPress={handleLogin} loading={loading} />
+      </Appear>
 
-        <View style={styles.footer}>
-          <Text style={[styles.link, { color: c.textMuted }]}>{t('app_login_no_account')}</Text>
-          <Link href="/register" style={[styles.link, { color: c.link }, linkDecoration(c)]}>
-            {t('app_login_create')}
-          </Link>
-        </View>
-      </View>
-    </Screen>
+      {/* Empurra o rodapé para o fim do cartão em telas altas, sem cortar nas pequenas. */}
+      <View style={styles.spacer} />
+
+      <Appear index={4} style={styles.footer}>
+        <Text style={[styles.footerText, { color: c.textMuted }]}>{t('app_login_no_account')}</Text>
+        <Text
+          accessibilityRole="link"
+          onPress={() => router.push('/register')}
+          style={[styles.footerLink, { color: c.link }, linkDecoration(c)]}>
+          {t('app_login_create')}
+        </Text>
+      </Appear>
+    </AuthScaffold>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 0, gap: 0 },
-  form: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 48, paddingBottom: 32, gap: 18 },
-  title: { fontSize: 30, fontFamily: fonts.regular, textAlign: 'center', marginBottom: 4 },
-  options: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 24 },
-  link: { fontSize: 15, fontFamily: fonts.regular },
-  underline: { textDecorationLine: 'underline' },
-  error: { textAlign: 'center' },
-  spacer: { flexGrow: 1, minHeight: 24 },
-  footer: { alignItems: 'center', gap: 2 },
+  options: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', columnGap: 12, paddingHorizontal: 2 },
+  link: { fontSize: 15, fontWeight: '600', paddingVertical: 12 }, // padding = área de toque de 44 px
+  spacer: { flexGrow: 1, minHeight: 4 },
+  footer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', columnGap: 6 },
+  footerText: { fontSize: 15 },
+  footerLink: { fontSize: 15, fontWeight: '600', paddingVertical: 12 }, // área de toque de 44 px
 });

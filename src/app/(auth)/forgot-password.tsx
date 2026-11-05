@@ -1,19 +1,17 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Linking, Platform, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { forgotPassword } from '@/api/auth';
+import { Appear } from '@/components/Appear';
+import { AuthScaffold, backToLogin } from '@/components/AuthScaffold';
 import { Button } from '@/components/Button';
-import { CurvedHeader } from '@/components/CurvedHeader';
-import { Logo } from '@/components/Logo';
-import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { TextField } from '@/components/TextField';
-import { statusColors } from '@/theme/colors';
-import { fonts } from '@/theme/fonts';
+import { FieldError, TextField } from '@/components/TextField';
+import { usePreferences } from '@/preferences/PreferencesProvider';
+import { contrastOutline, linkDecoration } from '@/theme/colors';
 import { useColors } from '@/theme/useColors';
 import { errorMessage } from '@/utils/errorMessage';
 
@@ -26,6 +24,7 @@ const openMailApp = () => Linking.openURL(Platform.OS === 'ios' ? 'message:' : '
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
   const c = useColors();
+  const { motionReduced } = usePreferences();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
@@ -56,40 +55,37 @@ export default function ForgotPasswordScreen() {
   const countdown = `${Math.floor(cooldown / 60)}:${String(cooldown % 60).padStart(2, '0')}`;
 
   return (
-    <Screen edges={['bottom']} contentStyle={styles.content}>
-      <StatusBar style={c.brandStatusBar} />
-      <CurvedHeader>
-        <Logo color={c.onBrand} colors={c.rainbow} size={64} />
-      </CurvedHeader>
-
-      <View style={styles.body}>
-        {sent ? (
-          <>
-            <View style={[styles.iconCircle, { backgroundColor: statusColors.available.background }]}>
-              <MaterialCommunityIcons name="email-outline" size={36} color={c.primary} />
-            </View>
-            <Text accessibilityRole="header" style={[styles.title, { color: c.primary }]}>{t('app_forgot_sent_title')}</Text>
-            <Text style={[styles.text, { color: c.textMuted }]}>
-              <Trans
-                i18nKey="app_forgot_sent"
-                values={{ email: email.trim() }}
-                components={{ b: <Text style={{ color: c.text, fontWeight: '700' }} /> }}
-              />
-            </Text>
-            <Button title={t('app_forgot_open_mail')} onPress={openMailApp} />
-            <Button
-              variant="outline"
-              title={cooldown > 0 ? t('app_forgot_resend_in', { time: countdown }) : t('app_forgot_resend')}
-              onPress={handleSend}
-              loading={loading}
-              disabled={cooldown > 0}
+    <AuthScaffold
+      back
+      title={sent ? t('app_forgot_sent_title') : t('app_forgot_title')}
+      subtitle={sent ? undefined : t('app_forgot_text')}>
+      {sent ? (
+        <Animated.View key="sent" entering={motionReduced ? undefined : FadeIn.duration(250)} style={styles.step}>
+          <Animated.View
+            entering={motionReduced ? undefined : ZoomIn.springify().damping(12)}
+            style={[styles.iconCircle, { backgroundColor: c.surface }, contrastOutline(c)]}>
+            <MaterialCommunityIcons name="email-check-outline" size={44} color={c.primary} />
+          </Animated.View>
+          <Text style={[styles.sentText, { color: c.textMuted }]}>
+            <Trans
+              i18nKey="app_forgot_sent"
+              values={{ email: email.trim() }}
+              components={{ b: <Text style={{ color: c.text, fontWeight: '700' }} /> }}
             />
-            {error ? <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={[styles.text, { color: c.danger }]}>{error}</Text> : null}
-          </>
-        ) : (
-          <>
-            <Text accessibilityRole="header" style={[styles.title, { color: c.primary }]}>{t('app_forgot_title')}</Text>
-            <Text style={[styles.text, { color: c.textMuted }]}>{t('app_forgot_text')}</Text>
+          </Text>
+          <Button title={t('app_forgot_open_mail')} icon="email-open-outline" onPress={openMailApp} />
+          <Button
+            variant="outline"
+            title={cooldown > 0 ? t('app_forgot_resend_in', { time: countdown }) : t('app_forgot_resend')}
+            onPress={handleSend}
+            loading={loading}
+            disabled={cooldown > 0}
+          />
+          <FieldError message={error ?? undefined} />
+        </Animated.View>
+      ) : (
+        <View style={styles.step}>
+          <Appear index={0}>
             <TextField
               label={t('global_email')}
               placeholder={t('app_email_ph')}
@@ -99,28 +95,33 @@ export default function ForgotPasswordScreen() {
               autoCapitalize="none"
               autoComplete="email"
               keyboardType="email-address"
+              returnKeyType="send"
               error={error ?? undefined}
               onSubmitEditing={handleSend}
             />
+          </Appear>
+          <Appear index={1} style={styles.action}>
             <Button title={t('app_forgot_send')} onPress={handleSend} loading={loading} />
-          </>
-        )}
+          </Appear>
+        </View>
+      )}
 
-        <View style={styles.spacer} />
-        <Link href="/login" style={[styles.back, { color: c.link }]}>
-          {t('app_back_to_login')}
-        </Link>
-      </View>
-    </Screen>
+      <View style={styles.spacer} />
+      <Text
+        accessibilityRole="link"
+        onPress={backToLogin}
+        style={[styles.back, { color: c.link }, linkDecoration(c)]}>
+        {t('app_back_to_login')}
+      </Text>
+    </AuthScaffold>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 0, gap: 0 },
-  body: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 36, paddingBottom: 40, gap: 20 },
-  iconCircle: { width: 80, height: 80, borderRadius: 40, alignSelf: 'center', alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 26, fontFamily: fonts.bold, textAlign: 'center' },
-  text: { fontSize: 16, lineHeight: 23, textAlign: 'center' },
-  spacer: { flexGrow: 1, minHeight: 24 },
-  back: { fontSize: 16, fontWeight: '600', textAlign: 'center', textDecorationLine: 'underline' },
+  step: { gap: 16 },
+  iconCircle: { width: 88, height: 88, borderRadius: 44, alignSelf: 'center', alignItems: 'center', justifyContent: 'center' },
+  sentText: { fontSize: 16, lineHeight: 23, textAlign: 'center' },
+  action: { marginTop: 8 },
+  spacer: { flexGrow: 1, minHeight: 16 },
+  back: { fontSize: 15, fontWeight: '600', textAlign: 'center', paddingVertical: 12 }, // área de toque de 44 px
 });

@@ -131,7 +131,6 @@ export default function EditProfileScreen() {
         <Text style={[styles.note, { color: c.textMuted }]}>{t('app_profile_cover_preview')}</Text>
       </View>
 
-      <Text style={[styles.label, { color: c.textMuted }]}>{t('register_name')}</Text>
       <TextField
         label={t('register_name')}
         icon="account-outline"
@@ -200,6 +199,5 @@ const styles = StyleSheet.create({
   },
   note: { fontSize: 13, textAlign: 'center' },
   photoLink: { fontSize: 16, fontWeight: '700', padding: 6 },
-  label: { fontSize: 14, marginBottom: -6, paddingHorizontal: 4 },
   spacer: { flex: 1, minHeight: 12 },
 });
