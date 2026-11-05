@@ -29,4 +29,6 @@ Branch: `feat/venue-socials` · Período: 05/11
 
 ## Commits
 - f083350 · feat: redes sociais da quadra no detalhe (mock da proposta D60)
-- fix: dias da semana com maiúscula só no começo e ícone por tipo de piso
+- 9c6b21b · fix: dias da semana com maiúscula só no começo e ícone por tipo de piso
+
+PR #7.

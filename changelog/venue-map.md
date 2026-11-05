@@ -18,4 +18,6 @@ Branch: `feat/venue-map` · Período: 05/11
   fica cinza.
 
 ## Commits
-- feat: mapa de verdade no detalhe da quadra
+- 8b92e4c · feat: mapa de verdade no detalhe da quadra
+
+PR #8.
