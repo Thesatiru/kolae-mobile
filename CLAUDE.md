@@ -149,7 +149,8 @@ nascimento é a roleta (`DateField`), sem digitar.
   build), senão o mapa fica cinza. A chave do site (`kolae.online`) é outra.
 - APK: a produção é `https://`, então **não precisa liberar tráfego HTTP**. Só seria preciso
   para um APK apontando para o backend local.
-- Build: EAS (perfil `preview` para APK de teste).
+- Build: EAS (perfil `preview` para APK de teste). Passo a passo (chave do Maps, build,
+  roteiro de teste pelo 4G e problemas comuns) em `docs/apk.md`.
 - Ambiente do desenvolvedor: Linux, testes no celular pelo Expo Go
 
 Antes de usar qualquer API do Expo, confira a documentação da versão 58
