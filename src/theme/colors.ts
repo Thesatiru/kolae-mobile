@@ -172,6 +172,17 @@ export function linkDecoration(c: ThemeColors) {
   return c.highContrast ? ({ textDecorationLine: 'underline' } as const) : null;
 }
 
+/**
+ * Fundo de destaque com texto corrido em cima (balão do chat). Branco sobre o azul da marca dá
+ * 3,66:1, abaixo do AA para texto pequeno: no tema Kolae usa o azul dos textos (#0069CC, 5,6:1).
+ * Nos outros temas o primary já passa de 4,5:1.
+ */
+export function primaryForText(c: ThemeColors) {
+  return c.primary === '#0084FF' && c.onPrimary === '#FFFFFF'
+    ? { background: '#0069CC', text: '#FFFFFF' }
+    : { background: c.primary, text: c.onPrimary };
+}
+
 // Status da quadra: sempre com texto junto, nunca só a cor. Iguais em todos os temas.
 // Em uso é vermelho (decidido em 29/10: "livre x ocupada" como semáforo); #D32F2F tem 5:1
 // com texto branco, para o pino selecionado.

@@ -171,3 +171,25 @@ export type Paginated<T> = {
 };
 
 export type UpdateMeInput = { name: string }; // só o nome: a data de nascimento não muda (D09)
+
+// Chat com o responsável pela quadra: docs/proposta-chat.md do João (vira a D62 quando o
+// contrato entrar no api.md). Só texto; datas com -03:00 (D16).
+export type ChatVenue = { id: number; name: string; cover_image_url: string | null };
+
+export type ChatMessage = {
+  id: number;
+  body: string;
+  mine: boolean; // a API já diz de quem é: o app não compara ids de usuário
+  created_at: string; // ISO 8601
+};
+
+export type Conversation = {
+  id: number;
+  venue: ChatVenue;
+  last_message: ChatMessage | null; // null: conversa aberta sem mensagens (a confirmar com o João)
+  unread_count: number;
+  blocked: boolean; // o responsável bloqueou: a pessoa não envia mais
+};
+
+/** after_id (polling: só as mais novas) ou before_id (as mais antigas, ao rolar para cima). */
+export type MessagesQuery = { after_id?: number; before_id?: number; per_page?: number };
