@@ -270,7 +270,7 @@ export default function VenueScreen() {
                   <Text style={[styles.hostName, { color: c.text }]}>{venue.owner.name}</Text>
                   <Text style={[styles.small, { color: c.textMuted }]}>{memberSince(venue.owner.member_since)}</Text>
                 </View>
-                {/* Chat é vitrine; o WhatsApp do dono (quando houver) fica dentro dele. */}
+                {/* Chat com o responsável (docs/proposta-chat.md); o WhatsApp dele (D24), quando houver, também fica no chat. */}
                 <Pressable
                   accessibilityRole="button"
                   hitSlop={6}

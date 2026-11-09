@@ -44,13 +44,16 @@ data de nascimento só leitura, D09), alterar senha, mapa e busca de quadras com
 detalhe da quadra, status e agenda.
 
 **Vitrine** (só visual, aviso "Prévia", nada chama a API): alterar e-mail com código (fora do
-escopo da entrega, D28), duas etapas, seguidores/feed/vitórias/PRO no perfil, chat com a
-quadra, avaliações, favoritos (D04) e a **Comunidade** (rede social do esporte: feed Para
+escopo da entrega, D28), duas etapas, seguidores/feed/vitórias/PRO no perfil, avaliações,
+favoritos (D04) e a **Comunidade** (rede social do esporte: feed Para
 você/Amigos, novo post e comentários; posts aceitam texto e foto, nunca links; respostas só
 texto). No perfil, capa, seguidores, vitórias, posts e fotos também são vitrine e saem da
 Comunidade (sem posts, o perfil fica vazio). Dados em `src/showcase/` (a Comunidade em
 `src/showcase/community.ts`), em memória. Exceção: os favoritos ficam salvos no aparelho, por
 usuário (AsyncStorage, `src/favorites/`), e também não vão para a API.
+
+**Chat com a quadra: deixou de ser vitrine** (proposta D62, ver "Chat" abaixo). O app está
+pronto e roda com mock; falta a API do João.
 
 ## Como o app consome a API
 
@@ -58,9 +61,10 @@ usuário (AsyncStorage, `src/favorites/`), e também não vão para a API.
   4G e na apresentação. O backend local (`http://localhost/kolae/api/v1` no PC do Rafael, ou
   `http://<IP do notebook>:8080/kolae/api/v1` no do João) serve **só para testar uma mudança
   antes do deploy**. A `main` do João publica direto na produção.
-- **Mock por área:** `EXPO_PUBLIC_MOCK_AUTH` e `EXPO_PUBLIC_MOCK_VENUES` (`true` = mock).
-  Cada função de `src/api/` escolhe real ou mock pelo interruptor da sua área. Com a
-  produção no ar, o normal é os dois em `false`.
+- **Mock por área:** `EXPO_PUBLIC_MOCK_AUTH`, `EXPO_PUBLIC_MOCK_VENUES` e `EXPO_PUBLIC_MOCK_CHAT`
+  (`true` = mock). Cada função de `src/api/` escolhe real ou mock pelo interruptor da sua área.
+  Com a produção no ar, o normal é AUTH e VENUES em `false`; o CHAT fica `true` até a API do
+  chat subir (no `.env` e no perfil `preview` do `eas.json`).
 - **Erros:** `ApiRequestError` tem `status`, `code`, `message` e `fieldErrors`.
   Mostrar `field()` embaixo do input; sem erro de campo, `message`.
 - **Deslogar só em erro de token** (D10): `AUTH_MISSING_TOKEN`, `AUTH_INVALID_FORMAT`,
@@ -82,6 +86,46 @@ usuário (AsyncStorage, `src/favorites/`), e também não vão para a API.
   (D23). Faixas que já passaram aparecem mais apagadas.
 - **Fuso:** tudo em horário de Brasília (D16). Mostrar horas com o fuso que vem na data.
 - O app envia `Accept-Language`; a API ainda responde em português (melhoria futura).
+- **Segundo plano:** o `focusManager` do TanStack segue o `AppState` (`src/network/online.ts`):
+  todo `refetchInterval` (status da quadra, polling do chat) para com o app fora da tela.
+
+## Chat (proposta D62, em andamento)
+
+Contrato: `docs/proposta-chat.md` do João (vira a D62 e entra no `api.md` quando os dois
+aprovarem). **Data de corte: 18/11.** Se até lá não funcionar de ponta a ponta, o chat volta a
+ser vitrine só com `EXPO_PUBLIC_MOCK_CHAT=true`: o aviso "Prévia" já aparece sozinho com o
+mock ligado.
+
+- Pessoa ↔ responsável pela quadra, **só texto, sem links**, até 1000 caracteres. O responsável
+  responde pelo painel do site. O WhatsApp (D24) continua no cabeçalho do chat e no detalhe.
+- **Polling**, sem WebSocket (HostGator): conversa aberta a cada 5 s (`after_id`), lista a cada
+  30 s, o Menu ao voltar para ele. Intervalos em `src/chat/useChatThread.ts`.
+- Rotas: `chat/[id]` recebe o id da **quadra** e abre (ou reaproveita) a conversa com
+  `POST /venues/{id}/conversations`. `messages` é a lista (Menu › Mensagens, com as não lidas).
+- `src/api/chat.ts`: uma função por rota da proposta. `src/api/mocks/chat.mock.ts` faz o papel
+  da API (mesmos códigos) e o responsável responde sozinho em 3 s. Comandos de teste no texto:
+  `#bloquear` (bloqueia a conversa) e `#falhar` (a 1ª tentativa dá 500).
+- `src/chat/useChatThread.ts`: mensagens numa query só (1ª busca = as mais recentes; depois só
+  `after_id`), mais antigas ao rolar para cima (`before_id`), envio otimista com "enviando" e
+  "não enviada" (tocar: tentar de novo ou apagar), marca como lida e anuncia no leitor de tela
+  o que chega. Erros: 422 devolve o texto para o campo com `errors.body`; 403 `CHAT_BLOCKED`
+  fecha o campo ("não recebe mais mensagens"); 404 no envio = quadra desativada, só leitura;
+  422 `CHAT_OWN_VENUE` ao abrir mostra "Esta quadra é sua".
+- Balão da pessoa: `primaryForText(c)` (no tema Kolae, branco sobre `#0069CC`, 5,6:1).
+
+**Para ligar na API:** o João sobe as rotas (com o painel, D62) → conferir as dúvidas abaixo →
+`EXPO_PUBLIC_MOCK_CHAT=false` no `.env` e no `eas.json` → testar app ↔ painel pelo 4G.
+Se o contrato mudar, só `src/api/types.ts`, `src/api/chat.ts` e o mock mudam; as telas não.
+
+**Dúvidas do contrato (combinar com o João, o app assumiu o que está entre parênteses):**
+1. `last_message` de uma conversa sem mensagens (`null`).
+2. `GET /conversations/{id}/messages` sem `after_id`/`before_id` (as `per_page` mais recentes,
+   em ordem crescente de id).
+3. Códigos dos 404: conversa que não é sua e envio com a quadra desativada (o app olha só o
+   status 404).
+4. Abrir a tela já cria a conversa (como na proposta), então podem surgir conversas vazias:
+   o painel e o `GET /conversations` deveriam esconder as que não têm mensagem.
+5. `Retry-After` do 429: o app mostra só a mensagem (o `ApiRequestError` não lê cabeçalhos).
 
 ## Telas
 
@@ -172,7 +216,8 @@ src/app/(app)/venue/[id]     informações da quadra
 src/app/(app)/settings/      configurações: index, general, privacy, appearance,
                              change-password, help
 src/app/(app)/post/          vitrine da Comunidade: [id] e new
-src/app/(app)/chat/[id]      vitrine
+src/app/(app)/chat/[id]      chat com a quadra (id da quadra); proposta D62
+src/app/(app)/messages       lista de conversas (Menu › Mensagens)
 src/app/(app)/reviews/[id]   vitrine
 src/api/                     uma função por endpoint, real ou mock; mocks em src/api/mocks/
 src/api/types.ts             tipos do contrato (seguir docs/api.md do João)
@@ -186,9 +231,11 @@ src/components/              Text, Button, TextField, Screen, PageHeader, Settin
                              Entrada: AuthScaffold, CourtLines, LiveTicker. Formulário:
                              DateField (roleta) e WheelPicker. Animação: Appear.
                              Carregando: Skeleton (e os de card, fileira e grade)
+src/chat/                    useChatThread (polling, envio, lida) e balões do chat
+src/network/                 internet (onlineManager), segundo plano (focusManager), faixa offline
 src/search/                  buscas recentes (no aparelho, por pessoa, como os favoritos)
 src/theme/                   cores e useColors()
-src/utils/                   datas, formatação, mapas, soon(); haptics.tick() é o ponto
+src/utils/                   datas, formatação, mapas, links (hasLink), soon(); haptics.tick() é o ponto
                              único da vibração (nunca chamar expo-haptics direto nas telas)
 tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 changelog/                   uma nota por branch (base do changelog); ver changelog/README.md
@@ -222,11 +269,13 @@ Em ordem de prioridade. Apague o item quando terminar.
    testar pelo 4G. A v1 sai **só como APK** (decidido em 05/11): sem Play Store nem App Store.
 2. **Mergear, nesta ordem:** `feat/search-redesign` (Pesquisar nova, vista no celular em 06/11),
    `docs/guia-apk` e `feat/haptics-settings` (vibração com opção; ainda não vista no celular).
-3. **Redes sociais da quadra** no detalhe: espera o contrato
+3. **Chat (D62):** app pronto com mock (branch `feat/chat`). Falta a API e o painel do João,
+   as dúvidas da seção "Chat" e o teste ponta a ponta. Corte em 18/11.
+4. **Redes sociais da quadra** no detalhe: espera o contrato
    (`docs/proposta-redes-sociais.md` do João; vira a D60). Até lá, mock seguindo a proposta.
-4. Revisar as vitrines com o aviso "Prévia" (S5).
+5. Revisar as vitrines com o aviso "Prévia" (S5).
 
-Depois da entrega (Laravel): chat e comunidade de verdade, favoritos na conta, push e as
+Depois da entrega (Laravel): chat em tempo real (sem polling), comunidade de verdade, favoritos na conta, push e as
 partidas com jogadores. Proposta em `docs/proposta-partidas.md` e lista em `docs/sugestoes.md`,
 no repositório do João. Nada disso entra antes de 28/11.
 

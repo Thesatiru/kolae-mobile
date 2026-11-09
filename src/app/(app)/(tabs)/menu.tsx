@@ -1,9 +1,13 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { listConversations } from '@/api/chat';
 import { useAuth } from '@/auth/AuthProvider';
+import { conversationsKey } from '@/chat/useChatThread';
 import { Screen } from '@/components/Screen';
 import { SettingsGroup, SettingsRow } from '@/components/SettingsList';
 import { Text } from '@/components/Text';
@@ -20,6 +24,15 @@ export default function MenuScreen() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { ids } = useFavorites();
+  // Não lidas do chat: atualiza ao voltar para o Menu (a aba fica montada, então sem polling aqui).
+  const conversations = useQuery({ queryKey: conversationsKey, queryFn: listConversations });
+  const { refetch: refetchConversations } = conversations;
+  useFocusEffect(
+    useCallback(() => {
+      void refetchConversations();
+    }, [refetchConversations]),
+  );
+  const unread = (conversations.data ?? []).reduce((sum, c) => sum + c.unread_count, 0);
 
   return (
     <Screen contentStyle={styles.content}>
@@ -49,6 +62,13 @@ export default function MenuScreen() {
       </Pressable>
 
       <SettingsGroup>
+        <SettingsRow
+          icon="message-text-outline"
+          label={t('app_messages_title')}
+          description={t('app_menu_messages_desc')}
+          value={unread ? t('app_messages_unread', { count: unread }) : undefined}
+          onPress={() => router.push('/messages')}
+        />
         <SettingsRow
           icon="crown-outline"
           label={t('app_plans_title')}

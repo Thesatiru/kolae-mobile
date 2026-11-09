@@ -33,6 +33,17 @@ export function formatPrice(cents: number | null): string | null {
   }
 }
 
+/** Dia de uma mensagem do chat: "Hoje", "Ontem" ou "12 de novembro" (no idioma do app). */
+export function formatMessageDay(iso: string): string {
+  const date = new Date(iso);
+  const today = new Date();
+  const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+  if (date.toDateString() === today.toDateString()) return i18n.t('app_chat_today');
+  if (date.toDateString() === yesterday.toDateString()) return i18n.t('app_chat_yesterday');
+  const sameYear = date.getFullYear() === today.getFullYear();
+  return date.toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: sameYear ? undefined : 'numeric' });
+}
+
 /** "2026-10-28T21:00:00Z" -> "21:00" no fuso do aparelho. */
 export function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
