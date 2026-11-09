@@ -80,6 +80,9 @@ pronto e roda com mock; falta a API do João.
 - **Fotos:** `cover_image_url`, `images` e `avatar_url` podem vir `null` (ou fora da lista)
   quando o arquivo não existe no servidor: mostrar a imagem padrão.
 - **Descrição:** `description` `null` esconde a seção "Sobre a quadra" (D30).
+- **Redes da quadra** (D60): `socials` vem sempre no detalhe (nunca na lista), com `null` no que
+  o dono não informou; as quatro `null` escondem a linha. Instagram e TikTok vêm só com o
+  usuário: o app monta o link. Facebook e site abrem como vieram.
 - **Distância no detalhe:** calculada no app com a posição da pessoa e as coordenadas (D33).
 - **Agenda:** dia sem funcionamento vem com `opens_at`/`closes_at` `null` e `slots` vazio:
   mostrar "Fechada neste dia". `opening_hours` vazio no detalhe = "Horário não informado"
@@ -235,7 +238,9 @@ src/chat/                    useChatThread (polling, envio, lida) e balões do c
 src/network/                 internet (onlineManager), segundo plano (focusManager), faixa offline
 src/search/                  buscas recentes (no aparelho, por pessoa, como os favoritos)
 src/theme/                   cores e useColors()
-src/utils/                   datas, formatação, mapas, links (hasLink), soon(); haptics.tick() é o ponto
+src/map/                     pinos, filtros e card da aba Mapa; VenueMiniMap (detalhe)
+src/utils/                   datas, formatação, mapas, links (hasLink), soon(); site.ts (links do site, como a
+                             página pública da quadra); haptics.tick() é o ponto
                              único da vibração (nunca chamar expo-haptics direto nas telas)
 tools/convert-lang.mjs       converte os lang/*.php do site para JSON
 changelog/                   uma nota por branch (base do changelog); ver changelog/README.md
@@ -267,17 +272,41 @@ Em ordem de prioridade. Apague o item quando terminar.
 
 1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
    testar pelo 4G. A v1 sai **só como APK** (decidido em 05/11): sem Play Store nem App Store.
-2. **Mergear, nesta ordem:** `feat/search-redesign` (Pesquisar nova, vista no celular em 06/11),
-   `docs/guia-apk` e `feat/haptics-settings` (vibração com opção; ainda não vista no celular).
-3. **Chat (D62):** app pronto com mock (branch `feat/chat`). Falta a API e o painel do João,
-   as dúvidas da seção "Chat" e o teste ponta a ponta. Corte em 18/11.
-4. **Redes sociais da quadra** no detalhe: espera o contrato
-   (`docs/proposta-redes-sociais.md` do João; vira a D60). Até lá, mock seguindo a proposta.
-5. Revisar as vitrines com o aviso "Prévia" (S5).
+   **Em andamento (05/11):** o João está mexendo no build. Antes, o projeto era da conta Expo
+   `satiru` e o João entrava como `slengm4n`, sem acesso. Anotar aqui qual conta compila e o
+   SHA-1 da keystore: a chave do Maps e o login com Google dependem dele.
+2. **Testar as redes da quadra de ponta a ponta:** a D60 está na produção desde 05/11, mas
+   nenhuma quadra real tinha rede cadastrada. Cadastrar numa quadra pelo painel do site e abrir
+   no app com o mock desligado.
+3. **Entrar com Google** (decidido tentar em 05/11; **corte em 12/11**). Proposta, contrato,
+   datas e plano B em `docs/proposta-login-google.md` do João. Não roda no Expo Go: precisa do
+   build do EAS. Se não sair até o corte, o botão some (`EXPO_PUBLIC_GOOGLE_LOGIN=false`).
+4. **Chat com o responsável pela quadra** (decidido tentar em 05/11; **corte em 18/11**). A pessoa
+   escreve pelo app (`chat/[id]` deixa de ser vitrine), o responsável responde pelo painel do
+   site, por consulta periódica. Proposta em `docs/proposta-chat.md` do João. Se não sair até o
+   corte, volta a ser vitrine com "Prévia".
+   **App pronto com mock** (branch `feat/chat`, 09/11; ver a seção "Chat"): falta a API e o
+   painel do João, as 5 dúvidas do contrato e o teste ponta a ponta pelo 4G.
+   Nas duas propostas, cada passo (inclusive o que der errado) vai no "Registro do andamento".
+5. Revisar as vitrines com o aviso "Prévia" (S5): faltam o perfil de outra pessoa
+   (`user/[handle]`), seguidores, vitórias e PRO no perfil, duas etapas e alterar e-mail.
+6. Estados de erro e vazio tela por tela (S5).
+7. **Perfil, polimento** (ideias de 05/11, sem contrato novo): "No Kolae desde" (`created_at`),
+   selo de responsável para `owner`, favoritos e vistas recentemente no perfil, vazio com "Criar
+   post", puxar para atualizar o `/me`, foto pela câmera, aviso de alterações não salvas no editar
+   perfil. Para `owner`, um atalho "Gerenciar minhas quadras" no Menu abrindo o painel do site
+   (gerenciar quadras pelo app fica fora: a API é só leitura, D02).
+8. **@usuário (nickname)** (ideia de 05/11, sem decisão): nome real + `@usuario` único, que hoje
+   o app inventa a partir do nome (`handleFor`). Pede coluna `username`, regras e `PATCH /me` no
+   site. Só se sobrar tempo; senão, proposta para depois da entrega.
+9. **Redes nos perfis das pessoas** (ideia de 05/11, sem decisão): como vitrine agora; de verdade
+   só junto da Comunidade real, depois da entrega.
 
-Depois da entrega (Laravel): chat em tempo real (sem polling), comunidade de verdade, favoritos na conta, push e as
+Depois da entrega (Laravel): comunidade de verdade, chat em tempo real, favoritos na conta e as
 partidas com jogadores. Proposta em `docs/proposta-partidas.md` e lista em `docs/sugestoes.md`,
-no repositório do João. Nada disso entra antes de 28/11.
+no repositório do João. Também ficam para depois: entrar com Apple (só se houver versão para
+iPhone) e abrir o app pelo link da quadra (App Links: `assetlinks.json` no site e
+`intentFilters`).
 
 ## Cronograma (igual ao docs/README.md do João)
 

@@ -22,13 +22,16 @@ import { QueryState } from '@/components/QueryState';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
 import { VenueHero } from '@/components/VenueHero';
+import { VenueSocials } from '@/components/VenueSocials';
 import { useUserPosition } from '@/location/useUserPosition';
+import { VenueMiniMap } from '@/map/VenueMiniMap';
 import { useRecentlyViewed } from '@/search/useRecentSearches';
 import { reviewStore, summarizeReviews } from '@/showcase/reviews';
 import { contrastOutline } from '@/theme/colors';
 import { fonts } from '@/theme/fonts';
 import { useColors } from '@/theme/useColors';
 import {
+  capitalizeFirst,
   formatClock,
   formatDecimal,
   formatPrice,
@@ -39,6 +42,7 @@ import {
   monthsSince,
   noPriceLabel,
 } from '@/utils/format';
+import { floorIcon } from '@/utils/floorIcons';
 import { distanceKm, hasCoordinates } from '@/utils/geo';
 import { mapsUrl } from '@/utils/maps';
 
@@ -69,7 +73,8 @@ function Hours({ hours }: { hours: OpeningHours[] }) {
   return (
     <View style={styles.hours}>
       {WEEK.map((weekday) => {
-        const day = formatWeekday(weekday);
+        // Maiúscula só na primeira letra: "Segunda-feira", não "Segunda-Feira" (capitalize do estilo).
+        const day = capitalizeFirst(formatWeekday(weekday));
         const open = hours.find((h) => h.weekday === weekday);
         const range = open ? `${formatClock(open.opens_at)} – ${formatClock(open.closes_at)}` : t('app_status_closed');
         const label = open
@@ -192,7 +197,7 @@ export default function VenueScreen() {
               <View style={[styles.hDivider, { backgroundColor: c.divider }]} />
 
               <View style={styles.features}>
-                {venue.floor_type ? <Feature icon="grass" label={t(`app_floor_${venue.floor_type}`)} /> : null}
+                {venue.floor_type ? <Feature icon={floorIcon(venue.floor_type)} label={t(`app_floor_${venue.floor_type}`)} /> : null}
                 <Feature
                   icon={venue.is_covered ? 'home-roof' : 'weather-sunny'}
                   label={venue.is_covered ? t('app_covered') : t('app_uncovered')}
@@ -291,6 +296,8 @@ export default function VenueScreen() {
                   />
                 </View>
               ) : null}
+              {/* Redes da quadra (proposta D60): some quando não há nenhuma. */}
+              <VenueSocials socials={venue.socials} />
 
               <View style={[styles.hDivider, { backgroundColor: c.divider }]} />
 
@@ -300,15 +307,7 @@ export default function VenueScreen() {
               <View style={[styles.hDivider, { backgroundColor: c.divider }]} />
 
               <Text accessibilityRole="header" style={[styles.sectionTitle, styles.noTopMargin, { color: c.text }]}>{t('app_location')}</Text>
-              {/* Mapa de verdade entra com o react-native-maps (S3); por ora, só o atalho. */}
-              {/* O quadro repete o link de baixo: fica fora do leitor de tela para não ler duas vezes. */}
-              <Pressable
-                accessible={false}
-                importantForAccessibility="no-hide-descendants"
-                onPress={() => Linking.openURL(mapsUrl(venue))}
-                style={[styles.mapBox, { backgroundColor: c.surface }, contrastOutline(c)]}>
-                <MaterialCommunityIcons name="map-marker" size={44} color={c.primary} />
-              </Pressable>
+              <VenueMiniMap venue={venue} />
               <Pressable
                 accessibilityRole="link"
                 accessibilityLabel={t('app_open_maps')}
@@ -387,9 +386,8 @@ const styles = StyleSheet.create({
   whatsapp: { marginTop: 16 },
   hours: { gap: 8 },
   hoursRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
-  hoursDay: { fontSize: 14, textTransform: 'capitalize' },
+  hoursDay: { fontSize: 14 },
   chatButton: { borderWidth: 1.5, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10 },
-  mapBox: { height: 170, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   price: { fontSize: 20, fontWeight: '800' },
   perHour: { fontSize: 14, fontWeight: '400' },
   bottomBar: {

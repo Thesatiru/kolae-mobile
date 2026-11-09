@@ -72,6 +72,13 @@ const venues: MockVenue[] = [
     },
     opening_hours: everyDay('08:00', '22:00'),
     owner: { name: 'Sesc SP', avatar_url: null, member_since: '2025-03-01T10:00:00-03:00', whatsapp: null },
+    // Redes: as quatro.
+    socials: {
+      instagram: 'sescsp',
+      tiktok: 'sescsp',
+      facebook_url: 'https://facebook.com/sescsp',
+      website_url: 'https://www.sescsp.org.br',
+    },
     matches: [{ start: '19:00', end: '21:00' }],
   },
   {
@@ -111,6 +118,8 @@ const venues: MockVenue[] = [
       member_since: '2025-10-01T10:00:00-03:00',
       whatsapp: '5511999990000',
     },
+    // Redes: só algumas.
+    socials: { instagram: 'arenadoxuxa', tiktok: null, facebook_url: 'https://facebook.com/arenadoxuxa', website_url: null },
     matches: ['now'],
   },
   {
@@ -142,6 +151,8 @@ const venues: MockVenue[] = [
     },
     opening_hours: everyDay('07:00', '21:00'),
     owner: { name: 'SESI', avatar_url: null, member_since: '2026-01-15T10:00:00-03:00', whatsapp: '5511988880000' },
+    // Redes: só o site.
+    socials: { instagram: null, tiktok: null, facebook_url: null, website_url: 'https://www.sesisp.org.br' },
     closedByOwner: true, // fechada pelo dono, sem data: status_until null
     matches: [],
   },
@@ -175,6 +186,8 @@ const venues: MockVenue[] = [
     },
     opening_hours: [], // horário não cadastrado: sempre fechada, "Horário não informado"
     owner: { name: 'Prefeitura de Suzano', avatar_url: null, member_since: '2026-06-10T10:00:00-03:00', whatsapp: null },
+    // Redes: nenhuma (a linha some).
+    socials: { instagram: null, tiktok: null, facebook_url: null, website_url: null },
     matches: [],
   },
   {
@@ -210,6 +223,8 @@ const venues: MockVenue[] = [
       { weekday: 6, opens_at: '08:00', closes_at: '18:00' },
     ],
     owner: { name: 'Carla Mendes', avatar_url: null, member_since: '2026-05-22T14:57:07-03:00', whatsapp: '5511977770000' },
+    // Redes: Instagram e TikTok.
+    socials: { instagram: 'arenaferraz', tiktok: 'arenaferraz', facebook_url: null, website_url: null },
     matches: [
       { start: '18:00', end: '19:00' },
       { start: '19:00', end: '20:30' }, // em sequência com a anterior: vira uma faixa só
@@ -315,6 +330,7 @@ function toSummary(venue: MockVenue, position: { lat: number; lng: number } | nu
     address: _address,
     opening_hours: _hours,
     owner: _owner,
+    socials: _socials,
     ...summary
   } = toDetail(venue);
   const distance =

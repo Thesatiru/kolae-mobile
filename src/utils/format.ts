@@ -55,6 +55,11 @@ export function formatClock(hhmm: string): string {
   return new Date(2000, 0, 1, h, m).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
 }
 
+/** "segunda-feira" -> "Segunda-feira": só a primeira letra (o textTransform do RN faz "Segunda-Feira"). */
+export function capitalizeFirst(text: string): string {
+  return text.charAt(0).toLocaleUpperCase(locale()) + text.slice(1);
+}
+
 /** 0 -> "domingo" ... 6 -> "sábado", no idioma do app. */
 export function formatWeekday(weekday: number): string {
   // 07/01/2024 foi um domingo.
