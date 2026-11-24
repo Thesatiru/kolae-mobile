@@ -75,7 +75,11 @@ Desligue o Wi-Fi para garantir que nada depende da rede de casa.
 - [ ] **Mapa com o mapa de fundo (não cinza)**, pinos com status e a posição da pessoa.
 - [ ] Detalhe da quadra, fotos, "Agendar" (agenda do dia) e **"Falar com o dono"** abrindo o
       WhatsApp.
-- [ ] Favoritar e ver em Favoritos; trocar a foto do perfil (câmera e galeria).
+- [ ] **Chat real:** "Conversar" numa quadra, mandar uma mensagem, responder pelo painel do site
+      (Mensagens) e ver a resposta chegar sozinha no app em até 5 s; o número de não lidas em
+      Menu › Mensagens. Sem o aviso "Prévia" (com ele, o `EXPO_PUBLIC_MOCK_CHAT` está `true`).
+- [ ] Favoritar e ver em Favoritos; trocar a foto do perfil (da galeria).
+- [ ] Configurações mostra **"Kolae 1.0.0"** no rodapé (a versão do APK).
 - [ ] Configurações: tema escuro, Alto contraste, texto grande, outro idioma.
 - [ ] Sem internet (modo avião): a faixa "sem conexão" aparece e o app volta sozinho.
 
@@ -88,7 +92,16 @@ Desligue o Wi-Fi para garantir que nada depende da rede de casa.
 | Login dá erro de rede | Conferir a URL no `eas.json` (`https://kolae.online/api/v1`) |
 | Localização nunca aparece | Permissão negada ao Kolae (Ajustes › Apps › Kolae › Permissões) ou GPS desligado |
 
-## APK final (S6)
+## Versões e APKs novos
 
-Mesmo comando. Antes, suba `version` no `app.config.ts` (ex.: `1.0.0` para `1.0.1`) para
-diferenciar os APKs, e anote no changelog qual build foi para a entrega.
+O APK da entrega é a **v1.0.0** (tag `v1.0.0`, `versionCode` 1). Para cada APK novo:
+
+1. **`versionCode`** no `app.config.ts`: **sempre sobe 1** (1, 2, 3...), mesmo que a versão não
+   mude. É assim que o Android aceita instalar o APK novo por cima do antigo, sem perder a sessão.
+2. **`version`** no `app.config.ts` e no `package.json` (sempre iguais), pelo
+   [SemVer](https://semver.org/lang/pt-BR/): correção `1.0.1`, funcionalidade nova `1.1.0`.
+3. Mova as notas de `changelog/` para uma seção nova do `CHANGELOG.md`, gere o APK, crie a tag
+   `vX.Y.Z` e a release no GitHub com o texto dessa seção (e o APK anexado ou o link da página
+   de download).
+
+Assim, o rodapé de Configurações ("Kolae 1.0.1") diz qual APK cada pessoa tem instalado.

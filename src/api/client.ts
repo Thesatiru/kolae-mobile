@@ -8,9 +8,9 @@ export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 // Mock por área: dá para usar o login real com as quadras ainda falsas (ou o contrário).
 export const MOCK_AUTH = process.env.EXPO_PUBLIC_MOCK_AUTH === 'true';
 export const MOCK_VENUES = process.env.EXPO_PUBLIC_MOCK_VENUES === 'true';
-// Chat (proposta D62): mock até a API subir. Fica fora do ANY_MOCK: se o chat não ficar pronto
-// até o corte (18/11), ele volta a ser vitrine com o mock ligado e o aviso "Prévia" na própria
-// tela, sem a faixa de modo de teste no app inteiro.
+// Chat (D66): real desde a v1.0.0 (a API está na produção desde a v1.7.0 do backend). Fica fora
+// do ANY_MOCK: com o mock ligado, o chat vira vitrine com o aviso "Prévia" só na própria tela,
+// sem a faixa de modo de teste no app inteiro (o plano B, se a API do chat cair).
 export const MOCK_CHAT = process.env.EXPO_PUBLIC_MOCK_CHAT === 'true';
 /** Alguma área usa dados falsos: mostra o aviso de modo de teste. */
 export const ANY_MOCK = MOCK_AUTH || MOCK_VENUES;

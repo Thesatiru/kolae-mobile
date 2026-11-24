@@ -52,8 +52,8 @@ Comunidade (sem posts, o perfil fica vazio). Dados em `src/showcase/` (a Comunid
 `src/showcase/community.ts`), em memória. Exceção: os favoritos ficam salvos no aparelho, por
 usuário (AsyncStorage, `src/favorites/`), e também não vão para a API.
 
-**Chat com a quadra: deixou de ser vitrine** (proposta D62, ver "Chat" abaixo). O app está
-pronto e roda com mock; falta a API do João.
+**Chat com a quadra: deixou de ser vitrine** (D66, ver "Chat" abaixo). Real desde a v1.0.0,
+com a API da produção.
 
 ## Como o app consome a API
 
@@ -63,8 +63,8 @@ pronto e roda com mock; falta a API do João.
   antes do deploy**. A `main` do João publica direto na produção.
 - **Mock por área:** `EXPO_PUBLIC_MOCK_AUTH`, `EXPO_PUBLIC_MOCK_VENUES` e `EXPO_PUBLIC_MOCK_CHAT`
   (`true` = mock). Cada função de `src/api/` escolhe real ou mock pelo interruptor da sua área.
-  Com a produção no ar, o normal é AUTH e VENUES em `false`; o CHAT fica `true` até a API do
-  chat subir (no `.env` e no perfil `preview` do `eas.json`).
+  Com a produção no ar, o normal é os três em `false` (no `.env` e no perfil `preview` do
+  `eas.json`). O CHAT em `true` é o plano B: o chat vira vitrine com o aviso "Prévia".
 - **Erros:** `ApiRequestError` tem `status`, `code`, `message` e `fieldErrors`.
   Mostrar `field()` embaixo do input; sem erro de campo, `message`.
 - **Deslogar só em erro de token** (D10): `AUTH_MISSING_TOKEN`, `AUTH_INVALID_FORMAT`,
@@ -92,12 +92,11 @@ pronto e roda com mock; falta a API do João.
 - **Segundo plano:** o `focusManager` do TanStack segue o `AppState` (`src/network/online.ts`):
   todo `refetchInterval` (status da quadra, polling do chat) para com o app fora da tela.
 
-## Chat (proposta D62, em andamento)
+## Chat (D66)
 
-Contrato: `docs/proposta-chat.md` do João (vira a D62 e entra no `api.md` quando os dois
-aprovarem). **Data de corte: 18/11.** Se até lá não funcionar de ponta a ponta, o chat volta a
-ser vitrine só com `EXPO_PUBLIC_MOCK_CHAT=true`: o aviso "Prévia" já aparece sozinho com o
-mock ligado.
+Contrato: seção "Chat" do `docs/api.md` do João (aprovado em 09/11; API na produção desde a
+v1.7.0 do backend). **Real no app desde a v1.0.0** (`EXPO_PUBLIC_MOCK_CHAT=false`). Se a API do
+chat cair, o plano B é `EXPO_PUBLIC_MOCK_CHAT=true`: o aviso "Prévia" aparece sozinho com o mock.
 
 - Pessoa ↔ responsável pela quadra, **só texto, sem links**, até 1000 caracteres. O responsável
   responde pelo painel do site. O WhatsApp (D24) continua no cabeçalho do chat e no detalhe.
@@ -116,19 +115,12 @@ mock ligado.
   422 `CHAT_OWN_VENUE` ao abrir mostra "Esta quadra é sua".
 - Balão da pessoa: `primaryForText(c)` (no tema Kolae, branco sobre `#0069CC`, 5,6:1).
 
-**Para ligar na API:** o João sobe as rotas (com o painel, D62) → conferir as dúvidas abaixo →
-`EXPO_PUBLIC_MOCK_CHAT=false` no `.env` e no `eas.json` → testar app ↔ painel pelo 4G.
 Se o contrato mudar, só `src/api/types.ts`, `src/api/chat.ts` e o mock mudam; as telas não.
 
-**Dúvidas do contrato (combinar com o João, o app assumiu o que está entre parênteses):**
-1. `last_message` de uma conversa sem mensagens (`null`).
-2. `GET /conversations/{id}/messages` sem `after_id`/`before_id` (as `per_page` mais recentes,
-   em ordem crescente de id).
-3. Códigos dos 404: conversa que não é sua e envio com a quadra desativada (o app olha só o
-   status 404).
-4. Abrir a tela já cria a conversa (como na proposta), então podem surgir conversas vazias:
-   o painel e o `GET /conversations` deveriam esconder as que não têm mensagem.
-5. `Retry-After` do 429: o app mostra só a mensagem (o `ApiRequestError` não lê cabeçalhos).
+As 5 dúvidas do contrato ficaram resolvidas no `api.md` final do jeito que o app já assumia:
+`last_message` `null` em conversa sem mensagens; sem `after_id`/`before_id` vêm as mais recentes
+em ordem crescente; `404 NOT_FOUND` (conversa que não é sua) e `404 VENUE_NOT_FOUND` (quadra
+desativada); o `GET /conversations` esconde as conversas sem mensagem; `Retry-After` é opcional.
 
 ## Telas
 
@@ -243,7 +235,11 @@ src/utils/                   datas, formatação, mapas, links (hasLink), soon()
                              página pública da quadra); haptics.tick() é o ponto
                              único da vibração (nunca chamar expo-haptics direto nas telas)
 tools/convert-lang.mjs       converte os lang/*.php do site para JSON
-changelog/                   uma nota por branch (base do changelog); ver changelog/README.md
+changelog/                   uma nota por branch até a próxima versão; ver changelog/README.md
+CHANGELOG.md                 histórico das versões lançadas (Keep a Changelog, SemVer)
+LICENSE                      todos os direitos reservados (João e Rafael); package.json UNLICENSED
+docs/apk.md                  gerar o APK, testar pelo 4G e lançar uma versão
+docs/img/                    prints do README
 ```
 
 ## Regras do código
@@ -266,47 +262,51 @@ changelog/                   uma nota por branch (base do changelog); ver change
 - Windows (máquina do João): rodar o Expo no PowerShell, não no WSL, com
   `npx.cmd expo start --offline` (sem login no Expo CLI a pergunta de conta trava o Expo Go).
 
+## Versões
+
+- [SemVer](https://semver.org/lang/pt-BR/), independente da versão do site/API: patch
+  (`1.0.1`) para correção, minor (`1.1.0`) para funcionalidade nova, major para mudança grande.
+- `version` no `app.config.ts` e no `package.json` sempre iguais; aparece em Configurações
+  ("Kolae 1.0.0") e na Central de ajuda.
+- `android.versionCode` no `app.config.ts` **sobe 1 a cada APK distribuído** e nunca volta.
+- Lançar: notas de `changelog/` viram a seção da versão no `CHANGELOG.md` (e saem da pasta),
+  branch `release/vX.Y.Z` com PR, depois do merge a tag `vX.Y.Z` na `main` e a release no GitHub
+  com o texto da seção. Passo a passo em `docs/apk.md`.
+- **v1.0.0** (24/11/2026): a versão da entrega, `versionCode` 1.
+
 ## Pendências
 
 Em ordem de prioridade. Apague o item quando terminar.
 
-1. **Primeiro APK de teste** (EAS, perfil `preview`) com a chave do Google Maps para Android;
-   testar pelo 4G. A v1 sai **só como APK** (decidido em 05/11): sem Play Store nem App Store.
-   **Em andamento (05/11):** o João está mexendo no build. Antes, o projeto era da conta Expo
-   `satiru` e o João entrava como `slengm4n`, sem acesso. Anotar aqui qual conta compila e o
-   SHA-1 da keystore: a chave do Maps e o login com Google dependem dele.
-2. **Testar as redes da quadra de ponta a ponta:** a D60 está na produção desde 05/11, mas
-   nenhuma quadra real tinha rede cadastrada. Cadastrar numa quadra pelo painel do site e abrir
-   no app com o mock desligado.
-3. **Entrar com Google** (decidido tentar em 05/11; **corte em 12/11**). Proposta, contrato,
-   datas e plano B em `docs/proposta-login-google.md` do João. Não roda no Expo Go: precisa do
-   build do EAS. Se não sair até o corte, o botão some (`EXPO_PUBLIC_GOOGLE_LOGIN=false`).
-4. **Chat com o responsável pela quadra** (decidido tentar em 05/11; **corte em 18/11**). A pessoa
-   escreve pelo app (`chat/[id]` deixa de ser vitrine), o responsável responde pelo painel do
-   site, por consulta periódica. Proposta em `docs/proposta-chat.md` do João. Se não sair até o
-   corte, volta a ser vitrine com "Prévia".
-   **App pronto com mock** (branch `feat/chat`, 09/11; ver a seção "Chat"): falta a API e o
-   painel do João, as 5 dúvidas do contrato e o teste ponta a ponta pelo 4G.
-   Nas duas propostas, cada passo (inclusive o que der errado) vai no "Registro do andamento".
-5. Revisar as vitrines com o aviso "Prévia" (S5): faltam o perfil de outra pessoa
-   (`user/[handle]`), seguidores, vitórias e PRO no perfil, duas etapas e alterar e-mail.
-6. Estados de erro e vazio tela por tela (S5).
-7. **Perfil, polimento** (ideias de 05/11, sem contrato novo): "No Kolae desde" (`created_at`),
-   selo de responsável para `owner`, favoritos e vistas recentemente no perfil, vazio com "Criar
-   post", puxar para atualizar o `/me`, foto pela câmera, aviso de alterações não salvas no editar
-   perfil. Para `owner`, um atalho "Gerenciar minhas quadras" no Menu abrindo o painel do site
-   (gerenciar quadras pelo app fica fora: a API é só leitura, D02).
-8. **@usuário (nickname)** (ideia de 05/11, sem decisão): nome real + `@usuario` único, que hoje
-   o app inventa a partir do nome (`handleFor`). Pede coluna `username`, regras e `PATCH /me` no
-   site. Só se sobrar tempo; senão, proposta para depois da entrega.
-9. **Redes nos perfis das pessoas** (ideia de 05/11, sem decisão): como vitrine agora; de verdade
-   só junto da Comunidade real, depois da entrega.
+Congelamento passou (21/11): até a entrega (28/11), só correções. Para lançar a **v1.0.0**:
 
-Depois da entrega (Laravel): comunidade de verdade, chat em tempo real, favoritos na conta e as
-partidas com jogadores. Proposta em `docs/proposta-partidas.md` e lista em `docs/sugestoes.md`,
-no repositório do João. Também ficam para depois: entrar com Apple (só se houver versão para
-iPhone) e abrir o app pelo link da quadra (App Links: `assetlinks.json` no site e
-`intentFilters`).
+1. **Testar o chat real de ponta a ponta pelo 4G** (app → painel do site → app), antes do APK
+   final. Se falhar sem conserto rápido: `EXPO_PUBLIC_MOCK_CHAT=true` no `eas.json` (vitrine).
+2. **Testar as redes da quadra de ponta a ponta:** cadastrar numa quadra pelo painel e abrir no
+   app.
+3. **Prints do README** em `docs/img/` (JPEG, 720 px de largura): já estão login, cadastro, mapa,
+   quadra, agenda e menu (24/11). Faltam a **Pesquisar** e o **chat real** (o print de 24/11
+   tinha o aviso "Prévia", de um build com `MOCK_CHAT=true`); ao chegarem, entram numa linha
+   nova da grade do README.
+4. **APK final v1.0.0** (`versionCode` 1) pelo EAS, com a chave do Maps; o João vai publicar
+   numa **página de download** no site. Anotar aqui qual conta Expo compila e o SHA-1 da
+   keystore (a chave do Maps depende dele). Depois: link da página no README e na release.
+5. **Tag `v1.0.0` e release no GitHub**, depois do merge da `release/v1.0.0`, com o texto da
+   seção 1.0.0 do `CHANGELOG.md`.
+
+Depois da entrega:
+- **No app, com API que já existe no backend v1.7.0:** pedidos de horário (D64), anúncios
+  "Patrocinado" (D63) e notificações do `GET /me/notifications`.
+- **Entrar com Google** (D65; ficou fora da v1.0, proposta em `docs/proposta-login-google.md`
+  do João) e notificação push (pede Firebase e build do EAS).
+- **Vitrines:** perfil de outra pessoa, seguidores, vitórias e PRO, duas etapas e alterar e-mail.
+- **Perfil, polimento:** "No Kolae desde", selo de responsável, favoritos e vistas recentemente
+  no perfil, foto pela câmera, aviso de alterações não salvas, atalho "Gerenciar minhas quadras"
+  para `owner` (abre o painel do site; a API é só leitura, D02).
+- **@usuário (nickname)** e **redes nos perfis das pessoas** (ideias de 05/11, sem decisão).
+- **Laravel:** comunidade de verdade, chat em tempo real, favoritos na conta e as partidas com
+  jogadores (`docs/proposta-partidas.md` e `docs/sugestoes.md` do João). Também: entrar com Apple
+  (só com versão para iPhone) e abrir o app pelo link da quadra (App Links).
 
 ## Cronograma (igual ao docs/README.md do João)
 

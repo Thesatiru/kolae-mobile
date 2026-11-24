@@ -172,8 +172,8 @@ export type Paginated<T> = {
 
 export type UpdateMeInput = { name: string }; // só o nome: a data de nascimento não muda (D09)
 
-// Chat com o responsável pela quadra: docs/proposta-chat.md do João (vira a D62 quando o
-// contrato entrar no api.md). Só texto; datas com -03:00 (D16).
+// Chat com o responsável pela quadra (D66): seção "Chat" do api.md do João. Só texto; datas com
+// -03:00 (D16).
 export type ChatVenue = { id: number; name: string; cover_image_url: string | null };
 
 export type ChatMessage = {
@@ -186,7 +186,7 @@ export type ChatMessage = {
 export type Conversation = {
   id: number;
   venue: ChatVenue;
-  last_message: ChatMessage | null; // null: conversa aberta sem mensagens (a confirmar com o João)
+  last_message: ChatMessage | null; // null: conversa aberta, ainda sem mensagens
   unread_count: number;
   blocked: boolean; // o responsável bloqueou: a pessoa não envia mais
 };
