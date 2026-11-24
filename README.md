@@ -16,13 +16,13 @@ e o app consome a API da produção.
 🔗 **[Conheça o Kolae](https://kolae.online)** · 📦 **Baixar o APK:** em breve, na página de
 download do Kolae (Android).
 
-| Entrada | Pesquisar | Mapa |
+| Entrada | Cadastro | Mapa |
 | :---: | :---: | :---: |
-| ![Tela de login com as linhas de quadra no topo e quadras de exemplo mostrando o status](docs/img/login.jpg) | ![Pesquisar com o resumo de quadras livres agora, filtros e o destaque da quadra livre mais perto](docs/img/pesquisar.jpg) | ![Mapa com os pinos das quadras na cor do status e a legenda](docs/img/mapa.jpg) |
+| ![Login com "Ache uma quadra livre agora." e um cartão de exemplo: Beach tennis, 0,8 km, Em uso até 21:00](docs/img/login.jpg) | ![Cadastro, etapa 1 de 2, com a data de nascimento em roleta de dia, mês e ano](docs/img/cadastro.jpg) | ![Mapa escuro com os pinos das quadras, o preço de cada uma e a legenda Disponível, Em uso e Fechada](docs/img/mapa.jpg) |
 
-| Quadra | Agenda do dia | Chat com o dono |
+| Quadra | Agenda do dia | Menu |
 | :---: | :---: | :---: |
-| ![Detalhe da quadra com fotos, status, preço e Falar com o dono](docs/img/quadra.jpg) | ![Status agora e as faixas livres e ocupadas do dia](docs/img/agenda.jpg) | ![Conversa com o responsável pela quadra](docs/img/chat.jpg) |
+| ![Detalhe da Quadra do Xuxa, em Suzano: foto, endereço a 0,4 km, Fechada até as 08:00, avaliações e estrutura](docs/img/quadra.jpg) | ![Fechada agora, abre às 08:00, a agenda de hoje a sábado com a faixa livre das 08:00 às 22:00 e Falar com o dono](docs/img/agenda.jpg) | ![Menu com o perfil, Mensagens, Planos, Favoritos, Configurações, Central de ajuda e Como usar o app](docs/img/menu.jpg) |
 
 ---
 

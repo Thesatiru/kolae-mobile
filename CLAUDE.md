@@ -284,7 +284,10 @@ Congelamento passou (21/11): até a entrega (28/11), só correções. Para lanç
    final. Se falhar sem conserto rápido: `EXPO_PUBLIC_MOCK_CHAT=true` no `eas.json` (vitrine).
 2. **Testar as redes da quadra de ponta a ponta:** cadastrar numa quadra pelo painel e abrir no
    app.
-3. **Prints do README** em `docs/img/` (lista no próprio README).
+3. **Prints do README** em `docs/img/` (JPEG, 720 px de largura): já estão login, cadastro, mapa,
+   quadra, agenda e menu (24/11). Faltam a **Pesquisar** e o **chat real** (o print de 24/11
+   tinha o aviso "Prévia", de um build com `MOCK_CHAT=true`); ao chegarem, entram numa linha
+   nova da grade do README.
 4. **APK final v1.0.0** (`versionCode` 1) pelo EAS, com a chave do Maps; o João vai publicar
    numa **página de download** no site. Anotar aqui qual conta Expo compila e o SHA-1 da
    keystore (a chave do Maps depende dele). Depois: link da página no README e na release.
