@@ -8,6 +8,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'Kolae',
   slug: 'kolae-mobile',
+  // Versão do app (aparece em Configurações e na Central de ajuda). Seguir o CHANGELOG.md e
+  // mudar junto com o "version" do package.json. Ver "Versões" no CLAUDE.md.
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
@@ -19,6 +21,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     package: 'br.com.kolae.app',
+    // Número inteiro que o Android usa para saber que um APK é mais novo que o instalado.
+    // Sobe 1 a cada APK distribuído (mesmo sem mudar a "version"); nunca volta.
+    versionCode: 1,
     adaptiveIcon: {
       backgroundColor: '#0084FF',
       foregroundImage: './assets/images/android-icon-foreground.png',
