@@ -1,6 +1,9 @@
 {
   "name": "kolae-mobile",
   "version": "1.0.0",
+  "description": "App do Kolae: encontre quadras particulares, veja se estão livres e fale com o dono.",
+  "author": "João Slengman e Rafael Lana dos Santos",
+  "license": "UNLICENSED",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo-google-fonts/atkinson-hyperlegible": "^0.4.1",
