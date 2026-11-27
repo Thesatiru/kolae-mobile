@@ -33,7 +33,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     predictiveBackGestureEnabled: false,
   },
   web: {
-    output: 'server',
+    // 'single': o app não tem rotas de API. Com 'server' o EAS gera um servidor web das rotas
+    // e o build quebra nas libs nativas (codegenNativeComponent is not a function).
+    output: 'single',
     favicon: './assets/images/favicon.png',
   },
   plugins: [
@@ -97,5 +99,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       projectId: '8c448852-a439-4b3e-a5b2-d90d271ac858',
     },
   },
-  owner: 'satiru',
+  owner: 'kolae', // organização do Expo (o projeto saiu da conta pessoal satiru)
 });
